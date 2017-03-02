@@ -1,1 +1,8 @@
 .h(text="Description").t(text="This is the text...")
+.d()
+.l(link="https://google.com").p(image="test.png",size=200x200)
+.e(exe="view.py")
+.b(name="button",link=:"https://youtube.com")
+.h(text="TEST SIZE 2",size=2)
+.i(action="buttons.php",text="label",name="name",value="default")
+r(action="radio.php",name="colour",value="red",value="green",value="blue").t(file="config")

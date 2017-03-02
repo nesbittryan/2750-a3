@@ -3,25 +3,24 @@ CFLAGS = -ansi -Wall -g
 
 all: post addauthor view creator
 
-post: post.cc libstream.a
-	mkdir messages
-	$(CC) $(CFLAGS) converter.c -o converter
-	./converter post.cc
-	rm converter
-	$(CC) $(CFLAGS) post.c -o post.o -c
-	$(CC) $(CFLAGS) post.c -o post -L. -lstream
-	rm post.c
-	rm *.o
+post: stream/post.cc libstream.a
+	$(CC) $(CFLAGS) converter/converter.c -o converter/c
+	./converter/c stream/post.cc
+	rm converter/c
+	$(CC) $(CFLAGS) stream/post.c -o stream/post.o -c
+	$(CC) $(CFLAGS) stream/post.c -o stream/post -L. -lstream
+	rm stream/post.c
+	rm stream/*.o
 
-addauthor: addauthor.c libstream.a
-	$(CC) $(CFLAGS) addauthor.c -o addauthor.o -c
-	$(CC) $(CFLAGS) addauthor.c -o addauthor -L. -lstream
-	rm *.o
+addauthor: stream/addauthor.c libstream.a
+	$(CC) $(CFLAGS) stream/addauthor.c -o stream/addauthor.o -c
+	$(CC) $(CFLAGS) stream/addauthor.c -o stream/addauthor -L. -lstream
+	rm stream/*.o
 
-libstream.a: stream.c stream.h
-	$(CC) -c stream.c -o stream.o
-	ar cr libstream.a stream.o
-	rm *.o
+libstream.a: stream/stream.c stream/stream.h
+	$(CC) -c stream/stream.c -o stream/stream.o
+	ar cr libstream.a stream/stream.o
+	rm stream/*.o
 
 view: view.py
 	chmod +x view.py
