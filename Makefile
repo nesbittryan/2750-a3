@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS = -ansi -Wall -g
 
-all: post addauthor view
+all: post addauthor view creator
 
 post: post.cc libstream.a
 	mkdir messages
@@ -25,3 +25,6 @@ libstream.a: stream.c stream.h
 
 view: view.py
 	chmod +x view.py
+
+creator: sitecreator.c
+	$(CC) $(CFLAGS) sitecreator.c -o sc
