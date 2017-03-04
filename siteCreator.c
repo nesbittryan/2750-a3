@@ -14,6 +14,10 @@ void addLine(char *tok, char *filename);
 
 void addImage(char *tok, char *filename);
 
+void addButton(char *tok, char * filename);
+
+void addInput(char *tok, char *filename);
+
 void addExe(char *tok, char *filename);
 
 int main(int argc, char **argv) {
@@ -53,9 +57,10 @@ int main(int argc, char **argv) {
 }
 
 void parseLine(char *buffer, char *filename) {
+    /*removeSpaces(buffer);*/
     char *tok = strtok(buffer, ")");
+    int flag = 0;
     while(tok != NULL) {
-        printf("%s\n", tok);
         if(tok[0] == '.' && tok[2] == '(') {
             switch(tok[1]) {
                 case 'h':
@@ -77,8 +82,11 @@ void parseLine(char *buffer, char *filename) {
                     addExe(tok, filename);
                     break;
                 case 'b':
+                    addButton(tok, filename);
                     break;
                 case 'i':
+                    addInput(tok, filename);
+                    flag = 1;
                     break;
                 case 'r':
                     break;
@@ -91,7 +99,85 @@ void parseLine(char *buffer, char *filename) {
 }
 
 void addExe(char *tok, char *filename) {
+    FILE *fp = fopen(filename, "a");
 
+    fclose(fp);
+}
+
+void addInput(char *tok, char *filename) {
+    char *action = strstr(tok, "action=");
+    char  *textptr, *nameptr, *valueptr;
+    int i = 0;
+    FILE *fp = fopen(filename, "a");
+    fprintf(fp, "<form action=\"");
+
+    while(action[i] != '"') {
+        fprintf(fp, "%c", action[i]);
+        ++i;
+    }
+
+    fprintf(fp, "\" method=\"post\">\n");
+
+    while((textptr = strstr(tok, "text=")) != NULL) {
+        textptr += 6;
+        nameptr = strstr(textptr, "name=");
+        valueptr = strstr(textptr, "value=");
+
+        fprintf(fp, "\t");
+
+        while(textptr[0] != '"') {
+            fprintf(fp, "%c", textptr[0]);
+            ++textptr;
+        }
+
+        fprintf(fp, "<input type=\"text\" name=\"");
+
+        nameptr += 6;
+        while(nameptr[0] != '"') {
+            fprintf(fp, "%c", nameptr[0]);
+            ++nameptr;
+        }
+
+        fprintf(fp, "\" value=\"");
+
+        valueptr += 7;
+        while(valueptr[0] != '"') {
+            fprintf(fp, "%c", valueptr[0]);
+            ++valueptr;
+        }
+
+        fprintf(fp, "\">\n");
+
+        tok = textptr;
+
+    }
+
+    fprintf(fp, "\t<input type=\"submit\" value=\"submit\"\n</form>\n");
+
+    fclose(fp);
+
+}
+
+void addButton(char *tok, char * filename) {
+    FILE *fp = fopen(filename, "a");
+    char *namePtr = strstr(tok, "name="), *linkPtr = strstr(tok, "link=");
+    if(namePtr == NULL || linkPtr == NULL) return;
+    namePtr +=6;
+    linkPtr +=6;
+    fprintf(fp, "<form action=\"");
+    int i = 0;
+    while(linkPtr[i] != '"') {
+        fprintf(fp, "%c", linkPtr[i]);
+        ++i;
+    }
+    fprintf(fp, "\">\n\t<input type=\"submit\" value=\"");
+    i =0;
+    while(namePtr[i] != '"') {
+        fprintf(fp, "%c", namePtr[i]);
+        ++i;
+    }
+    fprintf(fp, "\"/>\n</form>\n");
+    fclose(fp);
 }
 
 void addImage(char *tok, char *filename) {
