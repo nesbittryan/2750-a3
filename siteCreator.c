@@ -4,6 +4,8 @@
 
 char *removeSpaces(char * str);
 
+void printToFile(char *tok, char *filename);
+
 void parseLine(char *buffer, char *filename);
 
 void addLink(char *tok, char *filename);
@@ -19,6 +21,8 @@ void addImage(char *tok, char *filename);
 void addButton(char *tok, char * filename);
 
 void addInput(char *tok, char *filename);
+
+void addRadioButton(char *tok, char *filename);
 
 void addExe(char *tok, char *filename);
 
@@ -59,44 +63,43 @@ int main(int argc, char **argv) {
 }
 
 void parseLine(char *buffer, char *filename) {
-    printf("%s\n", buffer);
-    removeSpaces(buffer);
-    printf("%s\n", buffer);
     char *tok = strtok(buffer, ")");
-    int flag = 0;
     while(tok != NULL) {
         if(tok[0] == '.' && tok[2] == '(') {
             switch(tok[1]) {
                 case 'h':
-                    addHeading(tok, filename);
+                    addHeading(removeSpaces(tok), filename);
                     break;
                 case 't':
-                    addText(tok, filename);
+                    addText(removeSpaces(tok), filename);
                     break;
                 case 'd':
-                    addLine(tok, filename);
+                    addLine(removeSpaces(tok), filename);
                     break;
                 case 'l':
-                    addLink(tok, filename);
+                    addLink(removeSpaces(tok), filename);
                     break;
                 case 'p':
-                    addImage(tok, filename);
+                    addImage(removeSpaces(tok), filename);
                     break;
                 case 'e':
-                    addExe(tok, filename);
+                    addExe(removeSpaces(tok), filename);  /*FIXME*/
                     break;
                 case 'b':
-                    addButton(tok, filename);
+                    addButton(removeSpaces(tok), filename);
                     break;
                 case 'i':
-                    addInput(tok, filename);
-                    flag = 1;
+                    addInput(removeSpaces(tok), filename);
                     break;
                 case 'r':
+                    addRadioButton(removeSpaces(tok), filename);
                     break;
                 default:
+                    printToFile(tok, filename);
                     break;
             }
+        } else {
+            printToFile(tok, filename);
         }
         tok = strtok(NULL, ")");
     }
@@ -104,7 +107,54 @@ void parseLine(char *buffer, char *filename) {
 
 void addExe(char *tok, char *filename) {
     FILE *fp = fopen(filename, "a");
+    fclose(fp);
+}
 
+void addRadioButton(char *tok, char *filename) {
+    char *action = strstr(tok, "action=");
+    char *nameptr, *valueptr;
+    int i = 0 , j = 0;
+    FILE *fp = fopen(filename, "a");
+    fprintf(fp, "<form action=\"");
+    action += 8;
+    while(action[i] != '"') {
+        fprintf(fp, "%c", action[i]);
+        ++i;
+    }
+    fprintf(fp, "\" method=\"post\">\n");
+
+    nameptr = strstr(tok, "name=");
+    nameptr += 6;
+    while((valueptr = strstr(tok, "value=")) != NULL) {
+        valueptr += 7;
+        fprintf(fp, "\t");
+        fprintf(fp, "<input type=\"radio\" name=\"");
+        i = 0;
+        while(nameptr[i] != '"') {
+            fprintf(fp, "%c", nameptr[i]);
+            ++i;
+        }
+        fprintf(fp, "\" value=\"");
+        i = 0;
+        while(valueptr[i] != '"') {
+            fprintf(fp, "%c", valueptr[i]);
+            ++i;
+        }
+        if(j == 0) {
+            fprintf(fp, "\" checked>");
+        } else {
+            fprintf(fp, "\">");
+        }
+        i = 0;
+        while(valueptr[i] != '"') {
+            fprintf(fp, "%c", valueptr[i]);
+            ++i;
+        }
+        fprintf(fp, "<br>\n");
+        tok = valueptr;
+        j = 1;
+    }
+    fprintf(fp, "\t<input type=\"submit\" value=\"submit\">\n</form>\n");
     fclose(fp);
 }
 
@@ -114,52 +164,39 @@ void addInput(char *tok, char *filename) {
     int i = 0;
     FILE *fp = fopen(filename, "a");
     fprintf(fp, "<form action=\"");
-
+    action += 8;
     while(action[i] != '"') {
         fprintf(fp, "%c", action[i]);
         ++i;
     }
-
     fprintf(fp, "\" method=\"post\">\n");
-
     while((textptr = strstr(tok, "text=")) != NULL) {
         textptr += 6;
         nameptr = strstr(textptr, "name=");
         valueptr = strstr(textptr, "value=");
-
         fprintf(fp, "\t");
-
         while(textptr[0] != '"') {
             fprintf(fp, "%c", textptr[0]);
             ++textptr;
         }
-
         fprintf(fp, "<input type=\"text\" name=\"");
-
         nameptr += 6;
         while(nameptr[0] != '"') {
             fprintf(fp, "%c", nameptr[0]);
             ++nameptr;
         }
-
         fprintf(fp, "\" value=\"");
-
         valueptr += 7;
         while(valueptr[0] != '"') {
             fprintf(fp, "%c", valueptr[0]);
             ++valueptr;
         }
-
         fprintf(fp, "\">\n");
 
         tok = textptr;
-
     }
-
     fprintf(fp, "\t<input type=\"submit\" value=\"submit\"\n</form>\n");
-
     fclose(fp);
-
 }
 
 void addButton(char *tok, char * filename) {
@@ -206,7 +243,6 @@ void addImage(char *tok, char *filename) {
     fprintf(fp, ">\n");
     fclose(fp);
 }
-
 
 void addLine(char *tok, char *filename) {
     FILE *fp = fopen(filename, "a");
@@ -305,6 +341,11 @@ void addHeading(char *tok, char *filename) {
     fclose(fp);
 }
 
+void printToFile(char *tok, char *filename) {
+    FILE* fp = fopen(filename, "a");
+    fprintf(fp, "%s", tok);
+    fclose(fp);
+}
 char *removeSpaces(char * str) {
     int i;
     for(i = 0; i < strlen(str); ++i) {

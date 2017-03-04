@@ -25,5 +25,5 @@ libstream.a: stream/stream.c stream/stream.h
 view: view.py
 	chmod +x view.py
 
-creator: sitecreator.c
-	$(CC) $(CFLAGS) sitecreator.c -o sc
+creator: siteCreator.c
+	$(CC) $(CFLAGS) siteCreator.c -o sc

@@ -1,8 +1,11 @@
 <html>
 <body>
+    Creating page from file...
     <?php
-        echo “Today is “ . date(“l”) . “.”;
-        echo “<br> The date is above.”;
+        $file = $_POST["file"];
+        exec("./sc $file");
     ?>
+    DONE!
+    <hr>
 </body>
 </html>

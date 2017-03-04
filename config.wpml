@@ -5,4 +5,6 @@
 .e(exe="view.py").p(image="test.png")
 .b(name="button",link="https://youtube.com")
 .h(text="TEST SIZE 2",size=2)
-.r(action="radio.php",name="colour",value="red",value="green",value="blue").t(file="test.txt")
+this is a test of regular text
+.r(action="radio.php",name="colour",value="red",value="green",value="blue")
+.t(file="sample.txt")
