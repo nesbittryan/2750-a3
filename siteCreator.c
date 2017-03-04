@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+char *removeSpaces(char * str);
+
 void parseLine(char *buffer, char *filename);
 
 void addLink(char *tok, char *filename);
@@ -57,7 +59,9 @@ int main(int argc, char **argv) {
 }
 
 void parseLine(char *buffer, char *filename) {
-    /*removeSpaces(buffer);*/
+    printf("%s\n", buffer);
+    removeSpaces(buffer);
+    printf("%s\n", buffer);
     char *tok = strtok(buffer, ")");
     int flag = 0;
     while(tok != NULL) {
@@ -299,4 +303,26 @@ void addHeading(char *tok, char *filename) {
         fprintf(fp, "</h%c>\n", sizeptr[0]);
     }
     fclose(fp);
+}
+
+char *removeSpaces(char * str) {
+    int i;
+    for(i = 0; i < strlen(str); ++i) {
+        if(str[i] == '"') {
+            ++i;
+            while(str[i] != '"') {
+                ++i;
+            }
+            ++i;
+        }
+        if(str[i] == ' ') {
+            int j;
+            for(j = i; j < strlen(str) - 1; ++j) {
+                str[j] = str[j+1];
+            }
+            str[strlen(str) - 1] = '\0';
+            --i;
+        }
+    }
+    return str;
 }
