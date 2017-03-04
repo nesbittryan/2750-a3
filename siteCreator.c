@@ -10,16 +10,23 @@ void addText(char *tok, char *filename);
 
 void addHeading(char *tok, char *filename);
 
+void addLine(char *tok, char *filename);
+
+void addImage(char *tok, char *filename);
+
+void addExe(char *tok, char *filename);
+
 int main(int argc, char **argv) {
     if(argc != 2) {
         printf("Include Filename\n");
         return(-1);
     }
     char *filename = malloc(strlen(argv[1]) + 1);
-    char *outFileName = malloc(strlen(filename) + 5);
+    char *outFileName = malloc(strlen(argv[1]) + 1);
     strcpy(filename, argv[1]);
-    strcpy(outFileName, filename);
-    strcat(outFileName, ".html");
+    strcpy(outFileName, argv[1]);
+    char *ptr = strstr(outFileName, "wpml");
+    strcpy(ptr, "html");
     char *buffer = malloc(sizeof(char) * 1000);
     FILE *fp = fopen(filename, "r");
     if(fp == NULL) {
@@ -33,6 +40,7 @@ int main(int argc, char **argv) {
         buffer[strlen(buffer) - 1] = '\0';
         parseLine(buffer, outFileName);
     }
+
     outfp = fopen(outFileName, "a");
     fprintf(outfp,"</html>\n");
     fclose(outfp);
@@ -47,6 +55,7 @@ int main(int argc, char **argv) {
 void parseLine(char *buffer, char *filename) {
     char *tok = strtok(buffer, ")");
     while(tok != NULL) {
+        printf("%s\n", tok);
         if(tok[0] == '.' && tok[2] == '(') {
             switch(tok[1]) {
                 case 'h':
@@ -56,13 +65,16 @@ void parseLine(char *buffer, char *filename) {
                     addText(tok, filename);
                     break;
                 case 'd':
+                    addLine(tok, filename);
                     break;
                 case 'l':
                     addLink(tok, filename);
                     break;
                 case 'p':
+                    addImage(tok, filename);
                     break;
                 case 'e':
+                    addExe(tok, filename);
                     break;
                 case 'b':
                     break;
@@ -72,11 +84,44 @@ void parseLine(char *buffer, char *filename) {
                     break;
                 default:
                     break;
-
             }
         }
         tok = strtok(NULL, ")");
     }
+}
+
+void addExe(char *tok, char *filename) {
+
+}
+
+void addImage(char *tok, char *filename) {
+    FILE *fp = fopen(filename, "a");
+    char *sizePtr = strstr(tok, "size="), *imagePtr = strstr(tok, "image=");
+    fprintf(fp, "<img src=");
+    imagePtr += 6;
+    if(sizePtr != NULL) {
+        int i = 0;
+        while(imagePtr[i] != ',') {
+            fprintf(fp, "%c", imagePtr[i]);
+            ++i;
+        }
+        sizePtr += 5;
+        char *sizeTok = strtok(sizePtr, "x");
+        fprintf(fp, " width=\"%s\"", sizeTok);
+        sizeTok = strtok(NULL, ")");
+        fprintf(fp, " height =\"%s\"", sizeTok);
+    } else {
+        fprintf(fp, "%s width=\"100\" height = \"100\"", imagePtr);
+    }
+    fprintf(fp, ">\n");
+    fclose(fp);
+}
+
+
+void addLine(char *tok, char *filename) {
+    FILE *fp = fopen(filename, "a");
+    fprintf(fp, "<hr>\n");
+    fclose(fp);
 }
 
 void addText(char *tok, char *filename) {
@@ -102,10 +147,14 @@ void addText(char *tok, char *filename) {
             ++i;
         }
         FILE *infp = fopen(inFileName, "r");
-        while((c = fgetc(infp)) != EOF) {
-            fprintf(fp, "%c", c);
+        if(infp == NULL) {
+            fprintf(fp, "Invalid File");
+        } else {
+            while((c = fgetc(infp)) != EOF) {
+                fprintf(fp, "%c", c);
+            }
+            fclose(infp);
         }
-        fclose(infp);
     }
     fprintf(fp, "</p>");
     fclose(fp);
