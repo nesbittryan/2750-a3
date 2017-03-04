@@ -107,6 +107,7 @@ void parseLine(char *buffer, char *filename) {
 
 void addExe(char *tok, char *filename) {
     FILE *fp = fopen(filename, "a");
+
     fclose(fp);
 }
 
