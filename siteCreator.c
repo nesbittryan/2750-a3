@@ -107,7 +107,29 @@ void parseLine(char *buffer, char *filename) {
 
 void addExe(char *tok, char *filename) {
     FILE *fp = fopen(filename, "a");
-
+    char * nameptr = strstr(tok, "exe=");
+    nameptr += 5;
+    char exeName[100];
+    int i = 0;
+    while(nameptr[i] != '"') {
+        exeName[i] = nameptr[i];
+        ++i;
+    }
+    FILE *tempfp;
+    if((tempfp = fopen(exeName, "r")) == NULL) {
+        char temp[99];
+        strcpy(temp, "./bin/");
+        strcat(temp, exeName);
+        if((tempfp = fopen(temp, "r")) == NULL) {
+            fprintf(fp,"<?php\n\texec(\"%s\");\n?>\n", exeName);    //FIXME
+        } else {
+            fclose(tempfp);
+            fprintf(fp,"<?php\n\texec(\"%s\");\n?>\n", exeName);
+        }
+    } else {
+        fclose(tempfp);
+        fprintf(fp,"<?php\n\texec(\"%s\");\n?>\n", exeName);
+    }
     fclose(fp);
 }
 
