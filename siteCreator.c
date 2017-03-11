@@ -4,27 +4,27 @@
 
 char *removeSpaces(char * str);
 
-void printToFile(char *tok, char *filename);
+void printToFile(char *tok);
 
-void parseLine(char *buffer, char *filename);
+void parseLine(char *buffer);
 
-void addLink(char *tok, char *filename);
+void addLink(char *tok);
 
-void addText(char *tok, char *filename);
+void addText(char *tok);
 
-void addHeading(char *tok, char *filename);
+void addHeading(char *tok);
 
-void addLine(char *tok, char *filename);
+void addLine(char *tok);
 
-void addImage(char *tok, char *filename);
+void addImage(char *tok);
 
-void addButton(char *tok, char * filename);
+void addButton(char *tok);
 
-void addInput(char *tok, char *filename);
+void addInput(char *tok);
 
-void addRadioButton(char *tok, char *filename);
+void addRadioButton(char *tok);
 
-void addExe(char *tok, char *filename);
+void addExe(char *tok);
 
 int main(int argc, char **argv) {
     if(argc != 2) {
@@ -32,29 +32,20 @@ int main(int argc, char **argv) {
         return(-1);
     }
     char *filename = malloc(strlen(argv[1]) + 1);
-    char *outFileName = malloc(strlen(argv[1]) + 1);
     strcpy(filename, argv[1]);
-    strcpy(outFileName, argv[1]);
-    char *ptr = strstr(outFileName, "wpml");
-    strcpy(ptr, "html");
     char *buffer = malloc(sizeof(char) * 1000);
     FILE *fp = fopen(filename, "r");
     if(fp == NULL) {
         printf("Invalid File\n");
         return(-1);
     }
-    FILE *outfp = fopen(outFileName, "w");
-    fprintf(outfp,"<html>\n");
-    fclose(outfp);
+    printf("<html>\n");
     while(fgets(buffer, 999,fp)) {
         buffer[strlen(buffer) - 1] = '\0';
-        parseLine(buffer, outFileName);
+        parseLine(buffer);
     }
 
-    outfp = fopen(outFileName, "a");
-    fprintf(outfp,"</html>\n");
-    fclose(outfp);
-
+    printf("</html>\n");
     fclose(fp);
 
     free(buffer);
@@ -62,51 +53,50 @@ int main(int argc, char **argv) {
     return(0);
 }
 
-void parseLine(char *buffer, char *filename) {
+void parseLine(char *buffer) {
     char *tok = strtok(buffer, ")");
     while(tok != NULL) {
         if(tok[0] == '.' && tok[2] == '(') {
             switch(tok[1]) {
                 case 'h':
-                    addHeading(removeSpaces(tok), filename);
+                    addHeading(removeSpaces(tok));
                     break;
                 case 't':
-                    addText(removeSpaces(tok), filename);
+                    addText(removeSpaces(tok));
                     break;
                 case 'd':
-                    addLine(removeSpaces(tok), filename);
+                    addLine(removeSpaces(tok));
                     break;
                 case 'l':
-                    addLink(removeSpaces(tok), filename);
+                    addLink(removeSpaces(tok));
                     break;
                 case 'p':
-                    addImage(removeSpaces(tok), filename);
+                    addImage(removeSpaces(tok));
                     break;
                 case 'e':
-                    addExe(removeSpaces(tok), filename);  /*FIXME*/
+                    addExe(removeSpaces(tok));  /*FIXME*/
                     break;
                 case 'b':
-                    addButton(removeSpaces(tok), filename);
+                    addButton(removeSpaces(tok));
                     break;
                 case 'i':
-                    addInput(removeSpaces(tok), filename);
+                    addInput(removeSpaces(tok));
                     break;
                 case 'r':
-                    addRadioButton(removeSpaces(tok), filename);
+                    addRadioButton(removeSpaces(tok));
                     break;
                 default:
-                    printToFile(tok, filename);
+                    printToFile(tok);
                     break;
             }
         } else {
-            printToFile(tok, filename);
+            printToFile(tok);
         }
         tok = strtok(NULL, ")");
     }
 }
 
-void addExe(char *tok, char *filename) {
-    FILE *fp = fopen(filename, "a");
+void addExe(char *tok) {
     char * nameptr = strstr(tok, "exe=");
     nameptr += 5;
     char exeName[100];
@@ -121,169 +111,157 @@ void addExe(char *tok, char *filename) {
         strcpy(temp, "./bin/");
         strcat(temp, exeName);
         if((tempfp = fopen(temp, "r")) == NULL) {
-            fprintf(fp,"<?php\n\texec(\"%s\");\n?>\n", exeName);    //FIXME
+            printf("<?php\n\texec(\"%s\");\n?>\n", exeName);    //FIXME
         } else {
             fclose(tempfp);
-            fprintf(fp,"<?php\n\texec(\"%s\");\n?>\n", exeName);
+            printf("<?php\n\texec(\"%s\");\n?>\n", exeName);
         }
     } else {
         fclose(tempfp);
-        fprintf(fp,"<?php\n\texec(\"%s\");\n?>\n", exeName);
+        printf("<?php\n\texec(\"./%s\");\n?>\n", exeName);
     }
-    fclose(fp);
 }
 
-void addRadioButton(char *tok, char *filename) {
+void addRadioButton(char *tok) {
     char *action = strstr(tok, "action=");
     char *nameptr, *valueptr;
     int i = 0 , j = 0;
-    FILE *fp = fopen(filename, "a");
-    fprintf(fp, "<form action=\"");
+    printf( "<form action=\"");
     action += 8;
     while(action[i] != '"') {
-        fprintf(fp, "%c", action[i]);
+        printf( "%c", action[i]);
         ++i;
     }
-    fprintf(fp, "\" method=\"post\">\n");
+    printf( "\" method=\"post\">\n");
 
     nameptr = strstr(tok, "name=");
     nameptr += 6;
     while((valueptr = strstr(tok, "value=")) != NULL) {
         valueptr += 7;
-        fprintf(fp, "\t");
-        fprintf(fp, "<input type=\"radio\" name=\"");
+        printf("\t");
+        printf("<input type=\"radio\" name=\"");
         i = 0;
         while(nameptr[i] != '"') {
-            fprintf(fp, "%c", nameptr[i]);
+            printf( "%c", nameptr[i]);
             ++i;
         }
-        fprintf(fp, "\" value=\"");
+        printf("\" value=\"");
         i = 0;
         while(valueptr[i] != '"') {
-            fprintf(fp, "%c", valueptr[i]);
+            printf("%c", valueptr[i]);
             ++i;
         }
         if(j == 0) {
-            fprintf(fp, "\" checked>");
+            printf("\" checked>");
         } else {
-            fprintf(fp, "\">");
+            printf("\">");
         }
         i = 0;
         while(valueptr[i] != '"') {
-            fprintf(fp, "%c", valueptr[i]);
+            printf("%c", valueptr[i]);
             ++i;
         }
-        fprintf(fp, "<br>\n");
+        printf("<br>\n");
         tok = valueptr;
         j = 1;
     }
-    fprintf(fp, "\t<input type=\"submit\" value=\"submit\">\n</form>\n");
-    fclose(fp);
+    printf("\t<input type=\"submit\" value=\"submit\">\n</form>\n");
 }
 
-void addInput(char *tok, char *filename) {
+void addInput(char *tok) {
     char *action = strstr(tok, "action=");
     char  *textptr, *nameptr, *valueptr;
     int i = 0;
-    FILE *fp = fopen(filename, "a");
-    fprintf(fp, "<form action=\"");
+    printf( "<form action=\"");
     action += 8;
     while(action[i] != '"') {
-        fprintf(fp, "%c", action[i]);
+        printf( "%c", action[i]);
         ++i;
     }
-    fprintf(fp, "\" method=\"post\">\n");
+    printf("\" method=\"post\">\n");
     while((textptr = strstr(tok, "text=")) != NULL) {
         textptr += 6;
         nameptr = strstr(textptr, "name=");
         valueptr = strstr(textptr, "value=");
-        fprintf(fp, "\t");
+        printf( "\t");
         while(textptr[0] != '"') {
-            fprintf(fp, "%c", textptr[0]);
+            printf( "%c", textptr[0]);
             ++textptr;
         }
-        fprintf(fp, "<input type=\"text\" name=\"");
+        printf("<input type=\"text\" name=\"");
         nameptr += 6;
         while(nameptr[0] != '"') {
-            fprintf(fp, "%c", nameptr[0]);
+            printf( "%c", nameptr[0]);
             ++nameptr;
         }
-        fprintf(fp, "\" value=\"");
+        printf("\" value=\"");
         valueptr += 7;
         while(valueptr[0] != '"') {
-            fprintf(fp, "%c", valueptr[0]);
+            printf( "%c", valueptr[0]);
             ++valueptr;
         }
-        fprintf(fp, "\">\n");
+        printf("\">\n");
 
         tok = textptr;
     }
-    fprintf(fp, "\t<input type=\"submit\" value=\"submit\"\n</form>\n");
-    fclose(fp);
+    printf("\t<input type=\"submit\" value=\"submit\"\n</form>\n");
 }
 
-void addButton(char *tok, char * filename) {
-    FILE *fp = fopen(filename, "a");
+void addButton(char *tok) {
     char *namePtr = strstr(tok, "name="), *linkPtr = strstr(tok, "link=");
     if(namePtr == NULL || linkPtr == NULL) return;
     namePtr +=6;
     linkPtr +=6;
-    fprintf(fp, "<form action=\"");
+    printf("<form action=\"");
     int i = 0;
     while(linkPtr[i] != '"') {
-        fprintf(fp, "%c", linkPtr[i]);
+        printf( "%c", linkPtr[i]);
         ++i;
     }
-    fprintf(fp, "\">\n\t<input type=\"submit\" value=\"");
+    printf("\">\n\t<input type=\"submit\" value=\"");
     i =0;
     while(namePtr[i] != '"') {
-        fprintf(fp, "%c", namePtr[i]);
+        printf( "%c", namePtr[i]);
         ++i;
     }
-    fprintf(fp, "\"/>\n</form>\n");
-    fclose(fp);
+    printf("\"/>\n</form>\n");
 }
 
-void addImage(char *tok, char *filename) {
-    FILE *fp = fopen(filename, "a");
+void addImage(char *tok ) {
     char *sizePtr = strstr(tok, "size="), *imagePtr = strstr(tok, "image=");
-    fprintf(fp, "<img src=");
+    printf("<img src=");
     imagePtr += 6;
     if(sizePtr != NULL) {
         int i = 0;
         while(imagePtr[i] != ',') {
-            fprintf(fp, "%c", imagePtr[i]);
+            printf( "%c", imagePtr[i]);
             ++i;
         }
         sizePtr += 5;
         char *sizeTok = strtok(sizePtr, "x");
-        fprintf(fp, " width=\"%s\"", sizeTok);
+        printf(" width=\"%s\"", sizeTok);
         sizeTok = strtok(NULL, ")");
-        fprintf(fp, " height =\"%s\"", sizeTok);
+        printf(" height =\"%s\"", sizeTok);
     } else {
-        fprintf(fp, "%s width=\"100\" height = \"100\"", imagePtr);
+        printf("%s width=\"100\" height = \"100\"", imagePtr);
     }
-    fprintf(fp, ">\n");
-    fclose(fp);
+    printf(">\n");
 }
 
-void addLine(char *tok, char *filename) {
-    FILE *fp = fopen(filename, "a");
-    fprintf(fp, "<hr>\n");
-    fclose(fp);
+void addLine(char *tok ) {
+    printf("<hr>\n");
 }
 
-void addText(char *tok, char *filename) {
-    FILE *fp = fopen(filename, "a");
+void addText(char *tok ) {
     char *textptr = strstr(tok, "text="), *filenameptr = strstr(tok, "file=");
-    fprintf(fp, "<p>");
+    printf("<p>");
     if(filenameptr == NULL) {
         if(textptr == NULL) {
-            fprintf(fp, "Default text");
+            printf("Default text");
         } else {
             textptr += 6;
             while(textptr[0] != '"') {
-                fprintf(fp, "%c", textptr[0]);
+                printf("%c", textptr[0]);
                 ++textptr;
             }
         }
@@ -297,77 +275,70 @@ void addText(char *tok, char *filename) {
         }
         FILE *infp = fopen(inFileName, "r");
         if(infp == NULL) {
-            fprintf(fp, "Invalid File");
+            printf( "Invalid File");
         } else {
             while((c = fgetc(infp)) != EOF) {
-                fprintf(fp, "%c", c);
+                printf( "%c", c);
             }
             fclose(infp);
         }
     }
-    fprintf(fp, "</p>");
-    fclose(fp);
+    printf( "</p>");
 }
 
-void addLink(char *tok, char *filename) {
-    FILE *fp = fopen(filename, "a");
+void addLink(char *tok ) {
     char *linkptr = strstr(tok, "link="), *textptr = strstr(tok, "text=");
     linkptr += 6;
-    fprintf(fp, "<a href=\"");
+    printf("<a href=\"");
     while(linkptr[0] != '"') {
-        fprintf(fp, "%c", linkptr[0]);
+        printf( "%c", linkptr[0]);
         ++linkptr;
     }
-    fprintf(fp,"\">\n");
+    printf("\">\n");
     if(textptr == NULL) {
-        fprintf(fp,"link");
+        printf("link");
     } else {
         textptr += 6;
         while(textptr[0] != '"') {
-            fprintf(fp, "%c", textptr[0]);
+            printf( "%c", textptr[0]);
             ++textptr;
         }
     }
-    fprintf(fp, "</a>\n");
-    fclose(fp);
+    printf( "</a>\n");
 }
 
-void addHeading(char *tok, char *filename) {
-    FILE *fp = fopen(filename, "a");
+void addHeading(char *tok ) {
     char *sizeptr = strstr(tok, "size="), *textptr = strstr(tok, "text=");
     if(sizeptr == NULL) {
-        fprintf(fp, "<h3>\n");
+        printf( "<h3>\n");
         if(textptr == NULL) {
-            fprintf(fp, "HEADING");
+            printf( "HEADING");
         } else {
             textptr += 6;
             while(textptr[0] != '"') {
-                fprintf(fp, "%c", textptr[0]);
+                printf( "%c", textptr[0]);
                 ++textptr;
             }
         }
-        fprintf(fp, "</h3>\n");
+        printf( "</h3>\n");
     } else {
         sizeptr += 5;
-        fprintf(fp, "<h%c>\n", sizeptr[0]);
+        printf( "<h%c>\n", sizeptr[0]);
         if(textptr == NULL) {
-            fprintf(fp, "HEADING");
+            printf("HEADING");
         } else {
             textptr += 6;
             while(textptr[0] != '"') {
-                fprintf(fp, "%c", textptr[0]);
+                printf( "%c", textptr[0]);
                 ++textptr;
             }
         }
-        fprintf(fp, "</h%c>\n", sizeptr[0]);
+        printf( "</h%c>\n", sizeptr[0]);
     }
-    fclose(fp);
 }
 
-void printToFile(char *tok, char *filename) {
-    FILE* fp = fopen(filename, "a");
-    fprintf(fp, "%s", tok);
-    fclose(fp);
+void printToFile(char *tok ) {
+    printf( "%s", tok);
 }
 char *removeSpaces(char * str) {
     int i;
