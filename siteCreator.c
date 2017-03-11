@@ -111,7 +111,7 @@ void addExe(char *tok) {
         strcpy(temp, "./bin/");
         strcat(temp, exeName);
         if((tempfp = fopen(temp, "r")) == NULL) {
-            printf("<?php\n\texec(\"%s\");\n?>\n", exeName);    //FIXME
+            printf("<?php\n\texec(\"%s\");\n?>\n", exeName);    /*FIXME*/
         } else {
             fclose(tempfp);
             printf("<?php\n\texec(\"%s\");\n?>\n", exeName);
@@ -204,7 +204,7 @@ void addInput(char *tok) {
 
         tok = textptr;
     }
-    printf("\t<input type=\"submit\" value=\"submit\"\n</form>\n");
+    printf("\t<input type=\"submit\">\n</form>\n");
 }
 
 void addButton(char *tok) {
