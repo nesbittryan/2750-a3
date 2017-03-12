@@ -39,7 +39,9 @@ int main(int argc, char **argv) {
         printf("Invalid File\n");
         return(-1);
     }
+
     printf("<html>\n");
+
     while(fgets(buffer, 999,fp)) {
         buffer[strlen(buffer) - 1] = '\0';
         parseLine(buffer);

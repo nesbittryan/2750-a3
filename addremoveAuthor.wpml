@@ -4,6 +4,4 @@
 .b(name="New Post",link="https://www.google.ca/").b(name="Select Stream",link="https://www.google.ca/")
 .b(name="Logout",link="index.php")
 .d()
-.b(name="Prev Post",link="https://www.google.ca/").b(name="Next Post",link="https://www.google.ca/")
-.b(name="Order",link="https://www.google.ca/").b(name="Mark All Read",link="https://www.google.ca/")
-.b(name="Check New Posts",link="google.com")
+.i(action="processAddRemove.php",text="Author Name:",name="author",value="user1",text=" Add/Remove: ",name="flag",value="add",text=" Streams[,]:",name="streamlist",value="stream1")

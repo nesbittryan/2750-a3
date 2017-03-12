@@ -5,6 +5,22 @@
 #include"stream.h"
 
 class PostEntry {
+    void readInput(char * stream, char * text) {
+        printf("Stream: ");
+        fgets(stream, 99, stdin);
+        if(stream[0] == '\n') {
+            printf("Stream must be identified...\n");
+            exit(-1);
+        }
+        printf("Enter text: ");
+        strcpy(text, "");
+        char string[80];
+        while(fgets(string, 79, stdin)) {
+            printf("-");
+            strcat(text, string);
+        }
+        printf("\n");
+    }
 
     void formatEntry(struct userPost *up, char * name, char * stream, char * text, char * date) {
         up->username = (char*)malloc(sizeof(char) * strlen(name) + 1);
@@ -96,27 +112,21 @@ class PostEntry {
 };
 
 int main(int argc, char ** argv) {
-
-    int i = 3;
+    if(argv[1] == NULL) {
+        printf("Username must be entered...\n");
+        return(-1);
+    }
+    int i = 2;
     char name[100], stream[100], text[1000], date[100];
-    strcpy(stream, argv[1]);
-    strcpy(name, argv[2]);
-    while(strcmp(argv[i],"MSG://") != 0) {
-        printf("%s\n", argv[i]);
+    strcpy(name, argv[1]);
+    while(argv[i] != NULL) {
         strcat(name, " ");
         strcat(name, argv[i]);
         ++i;
     }
-    ++i;
-    strcpy(text, argv[i]);
-    ++i;
-    while(argv[i] != NULL) {
-        strcat(text, argv[i]);
-        ++i;
-    }
-    printf("HERE\n");
     struct userPost up;
     class PostEntry myPost;
+    myPost.readInput(&stream[0], &text[0]);
     myPost.getTimeDate(&date[0]);
     myPost.formatEntry(&up, name, stream, text, date);
     myPost.submitPost(up);

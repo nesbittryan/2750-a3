@@ -1,5 +1,5 @@
 <?php
-exec('./sc home.wpml', $return);
+exec("./sc addremoveAuthor.wpml", $return);
 foreach($return as $line) {
     echo "$line";
 }
