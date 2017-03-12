@@ -2,15 +2,12 @@
 
 int main(int argc, char ** argv) {
     int i = 2, rFlag = 0;
-    printf("HERE\n");
     if(strcmp(argv[1], "remove") == 0) {
         rFlag = 1;
     }
-    printf("HERE\n");
     char * username = malloc(sizeof(char) * 100);
     char streams[100];
     strcpy(username, argv[i]);
-    printf("HERE\n");
     while(argv[i+2] != NULL) {
         strcat(username, " ");
         strcat(username, argv[i+1]);
@@ -18,7 +15,6 @@ int main(int argc, char ** argv) {
     }
     ++i;
     strcpy(streams,argv[i]);
-    printf("HERE\n");
     int j;
     for(i = 0; i < strlen(streams); ++i) {
         if(streams[i] == ' ') {

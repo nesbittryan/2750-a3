@@ -4,4 +4,4 @@
 .b(name="New Post",link="addPost.php",hInput=1).b(name="Select Stream",link="https://www.google.ca/",hInput=1)
 .b(name="Logout",link="index.php")
 .d()
-.i(action="processAddRemoveAuthor.php",hInput=1,text="Author Name:",name="author",value="Default",text=" Add/Remove: ",name="flag",value="add",text=" Streams[,]:",name="streamlist",value="DefaultStream")
+.i(action="processAddPost.php",hInput=1,text="Stream:",name="stream",value="DefaultStream",text="Message:",name="message",value="Type the message in here")

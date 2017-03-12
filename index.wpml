@@ -1,2 +1,2 @@
 .h(text="CIS2750 Messaging Service",size=1).d()
-.i(action="login.php",text="Username: ",name="username",value="Default User")
+.i(action="home.php",text="Username: ",name="username",value="Default")

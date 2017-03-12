@@ -83,7 +83,7 @@ void updateStream(struct userPost *st) {
         streamDataFile = fopen(streamDataFilename, "a+");   /* FINISH STREAM DATA FILE */
         fprintf(streamDataFile, "%d\n", count);
         fclose(streamDataFile);
-        printf("Message posted to <%s>...\n", st->streamname);
+        printf("Message posted\n");
 
     } else {
         printf("%s does not have permission for stream <%s>...\n", st->username, st->streamname);
@@ -194,13 +194,13 @@ void removeUser(char *username, char *list) {
                 if(strcmp(copyStr, username) != 0) {
                     fprintf(copy, "%s", str);
                 } else {
-                    printf("Removing %s from <%s>...\n", username, token);
+                    printf("Removing %s\n", username);
                     flag = 1;
                 }
                 free(copyStr);
             }
             if(flag == 0) {
-                printf("%s not found in <%s>...\n",username, token);
+                printf("%s not found \n",username);
             }
             rename("messages/copy", filename);
             fclose(copy);

@@ -101,8 +101,7 @@ int main(int argc, char ** argv) {
     char name[100], stream[100], text[1000], date[100];
     strcpy(stream, argv[1]);
     strcpy(name, argv[2]);
-    while(strcmp(argv[i],"MSG://") != 0) {
-        printf("%s\n", argv[i]);
+    while(strcmp(argv[i],"MESSAGE_TEXT") != 0) {
         strcat(name, " ");
         strcat(name, argv[i]);
         ++i;
@@ -111,10 +110,10 @@ int main(int argc, char ** argv) {
     strcpy(text, argv[i]);
     ++i;
     while(argv[i] != NULL) {
+        strcat(text, " ");
         strcat(text, argv[i]);
         ++i;
     }
-    printf("HERE\n");
     struct userPost up;
     class PostEntry myPost;
     myPost.getTimeDate(&date[0]);

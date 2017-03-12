@@ -3,7 +3,7 @@
     Creating page from file...
     <?php
         $file = $_POST["file"];
-        exec("./sc $file");
+        exec("./sc $file none");
     ?>
     DONE!
     <hr>

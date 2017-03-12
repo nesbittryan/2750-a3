@@ -6,7 +6,7 @@ char *removeSpaces(char * str);
 
 void printToFile(char *tok);
 
-void parseLine(char *buffer);
+void parseLine(char *buffer, char * username);
 
 void addLink(char *tok);
 
@@ -18,17 +18,17 @@ void addLine(char *tok);
 
 void addImage(char *tok);
 
-void addButton(char *tok);
+void addButton(char *tok, char *username);
 
-void addInput(char *tok);
+void addInput(char *tok, char *username);
 
-void addRadioButton(char *tok);
+void addRadioButton(char *tok, char *username);
 
 void addExe(char *tok);
 
 int main(int argc, char **argv) {
-    if(argc != 2) {
-        printf("Include Filename\n");
+    if(argc < 3) {
+        printf("Include Filename and Username\n");
         return(-1);
     }
     char *filename = malloc(strlen(argv[1]) + 1);
@@ -39,12 +39,21 @@ int main(int argc, char **argv) {
         printf("Invalid File\n");
         return(-1);
     }
+    char username[500];
+    int i = 2;
+    strcpy(username, argv[i]);
+    ++i;
+    while(argv[i] != NULL) {
+        strcat(username, " ");
+        strcat(username, argv[i]);
+        ++i;
+    }
 
     printf("<html>\n");
 
     while(fgets(buffer, 999,fp)) {
         buffer[strlen(buffer) - 1] = '\0';
-        parseLine(buffer);
+        parseLine(buffer, username);
     }
 
     printf("</html>\n");
@@ -55,7 +64,7 @@ int main(int argc, char **argv) {
     return(0);
 }
 
-void parseLine(char *buffer) {
+void parseLine(char *buffer, char * username) {
     char *tok = strtok(buffer, ")");
     while(tok != NULL) {
         if(tok[0] == '.' && tok[2] == '(') {
@@ -79,13 +88,13 @@ void parseLine(char *buffer) {
                     addExe(removeSpaces(tok));  /*FIXME*/
                     break;
                 case 'b':
-                    addButton(removeSpaces(tok));
+                    addButton(removeSpaces(tok), username);
                     break;
                 case 'i':
-                    addInput(removeSpaces(tok));
+                    addInput(removeSpaces(tok), username);
                     break;
                 case 'r':
-                    addRadioButton(removeSpaces(tok));
+                    addRadioButton(removeSpaces(tok), username);
                     break;
                 default:
                     printToFile(tok);
@@ -124,7 +133,7 @@ void addExe(char *tok) {
     }
 }
 
-void addRadioButton(char *tok) {
+void addRadioButton(char *tok, char *username) {
     char *action = strstr(tok, "action=");
     char *nameptr, *valueptr;
     int i = 0 , j = 0;
@@ -135,7 +144,10 @@ void addRadioButton(char *tok) {
         ++i;
     }
     printf( "\" method=\"post\">\n");
-
+    char *hInput = strstr(tok, "hInput=1");
+    if(hInput != NULL) {
+        printf("\n\t<input type=\"hidden\" name=\"username\" value=\"%s\">\n", username);
+    }
     nameptr = strstr(tok, "name=");
     nameptr += 6;
     while((valueptr = strstr(tok, "value=")) != NULL) {
@@ -170,9 +182,10 @@ void addRadioButton(char *tok) {
     printf("\t<input type=\"submit\" value=\"submit\">\n</form>\n");
 }
 
-void addInput(char *tok) {
+void addInput(char *tok, char *username) {
     char *action = strstr(tok, "action=");
-    char  *textptr, *nameptr, *valueptr;
+    char *textptr, *nameptr, *valueptr;
+    char *hInput = strstr(tok, "hInput=1");
     int i = 0;
     printf( "<form action=\"");
     action += 8;
@@ -181,6 +194,9 @@ void addInput(char *tok) {
         ++i;
     }
     printf("\" method=\"post\">\n");
+    if(hInput != NULL) {
+        printf("\n\t<input type=\"hidden\" name=\"username\" value=\"%s\">\n", username);
+    }
     while((textptr = strstr(tok, "text=")) != NULL) {
         textptr += 6;
         nameptr = strstr(textptr, "name=");
@@ -209,7 +225,7 @@ void addInput(char *tok) {
     printf("\t<input type=\"submit\">\n</form>\n");
 }
 
-void addButton(char *tok) {
+void addButton(char *tok, char *username) {
     char *namePtr = strstr(tok, "name="), *linkPtr = strstr(tok, "link=");
     if(namePtr == NULL || linkPtr == NULL) return;
     namePtr +=6;
@@ -220,7 +236,13 @@ void addButton(char *tok) {
         printf( "%c", linkPtr[i]);
         ++i;
     }
-    printf("\">\n\t<input type=\"submit\" value=\"");
+    char *hInput = strstr(tok, "hInput=1");
+    if(hInput != NULL) {
+        printf("\" method=\"post\">\n\t<input type=\"hidden\" name=\"username\" value=\"%s\">\n", username);
+    } else {
+        printf("\">\n\t");
+    }
+    printf("<input type=\"submit\" value=\"");
     i =0;
     while(namePtr[i] != '"') {
         printf( "%c", namePtr[i]);
