@@ -6,7 +6,7 @@ char *removeSpaces(char * str);
 
 void printToFile(char *tok);
 
-void parseLine(char *buffer, char * username);
+void parseLine(char *buffer, char * username, char *streamname, char *messagenum);
 
 void addLink(char *tok);
 
@@ -18,11 +18,11 @@ void addLine(char *tok);
 
 void addImage(char *tok);
 
-void addButton(char *tok, char *username);
+void addButton(char *tok, char *username, char *streamname, char *messagenum);
 
-void addInput(char *tok, char *username);
+void addInput(char *tok, char *username, char *streamname, char *messagenum);
 
-void addRadioButton(char *tok, char *username);
+void addRadioButton(char *tok, char *username, char *streamname, char *messagenum);
 
 void addExe(char *tok);
 
@@ -40,7 +40,11 @@ int main(int argc, char **argv) {
         return(-1);
     }
     char username[500];
-    int i = 2;
+    char streamname[50];
+    char messagenum[50];
+    strcpy(streamname, argv[2]);
+    strcpy(messagenum, argv[3]);
+    int i = 4;
     strcpy(username, argv[i]);
     ++i;
     while(argv[i] != NULL) {
@@ -53,7 +57,7 @@ int main(int argc, char **argv) {
 
     while(fgets(buffer, 999,fp)) {
         buffer[strlen(buffer) - 1] = '\0';
-        parseLine(buffer, username);
+        parseLine(buffer, username, streamname, messagenum);
     }
 
     printf("</html>\n");
@@ -64,7 +68,7 @@ int main(int argc, char **argv) {
     return(0);
 }
 
-void parseLine(char *buffer, char * username) {
+void parseLine(char *buffer, char * username, char *streamname, char *messagenum) {
     char *tok = strtok(buffer, ")");
     while(tok != NULL) {
         if(tok[0] == '.' && tok[2] == '(') {
@@ -88,13 +92,13 @@ void parseLine(char *buffer, char * username) {
                     addExe(removeSpaces(tok));  /*FIXME*/
                     break;
                 case 'b':
-                    addButton(removeSpaces(tok), username);
+                    addButton(removeSpaces(tok), username, streamname, messagenum);
                     break;
                 case 'i':
-                    addInput(removeSpaces(tok), username);
+                    addInput(removeSpaces(tok), username, streamname, messagenum);
                     break;
                 case 'r':
-                    addRadioButton(removeSpaces(tok), username);
+                    addRadioButton(removeSpaces(tok), username, streamname, messagenum);
                     break;
                 default:
                     printToFile(tok);
@@ -133,7 +137,7 @@ void addExe(char *tok) {
     }
 }
 
-void addRadioButton(char *tok, char *username) {
+void addRadioButton(char *tok, char *username, char *streamname, char *messagenum) {
     char *action = strstr(tok, "action=");
     char *nameptr, *valueptr;
     int i = 0 , j = 0;
@@ -147,6 +151,12 @@ void addRadioButton(char *tok, char *username) {
     char *hInput = strstr(tok, "hInput=1");
     if(hInput != NULL) {
         printf("\n\t<input type=\"hidden\" name=\"username\" value=\"%s\">\n", username);
+        if(strcmp(streamname, "STREAM_NULL") != 0) {
+            printf("\n\t<input type=\"hidden\" name=\"streamChoice\" value=\"%s\">\n", streamname);
+        }
+        if(strcmp(messagenum, "NULL_MSG") != 0) {
+            printf("\n\t<input type=\"hidden\" name=\"messageNum\" value=\"%s\">\n", messagenum);
+        }
     }
     nameptr = strstr(tok, "name=");
     nameptr += 6;
@@ -182,7 +192,7 @@ void addRadioButton(char *tok, char *username) {
     printf("\t<input type=\"submit\" value=\"submit\">\n</form>\n");
 }
 
-void addInput(char *tok, char *username) {
+void addInput(char *tok, char *username, char *streamname, char *messagenum) {
     char *action = strstr(tok, "action=");
     char *textptr, *nameptr, *valueptr;
     char *hInput = strstr(tok, "hInput=1");
@@ -196,6 +206,12 @@ void addInput(char *tok, char *username) {
     printf("\" method=\"post\">\n");
     if(hInput != NULL) {
         printf("\n\t<input type=\"hidden\" name=\"username\" value=\"%s\">\n", username);
+        if(strcmp(streamname, "STREAM_NULL") != 0) {
+            printf("\n\t<input type=\"hidden\" name=\"streamChoice\" value=\"%s\">\n", streamname);
+        }
+        if(strcmp(messagenum, "NULL_MSG") != 0) {
+            printf("\n\t<input type=\"hidden\" name=\"messageNum\" value=\"%s\">\n", messagenum);
+        }
     }
     while((textptr = strstr(tok, "text=")) != NULL) {
         textptr += 6;
@@ -225,7 +241,7 @@ void addInput(char *tok, char *username) {
     printf("\t<input type=\"submit\">\n</form>\n");
 }
 
-void addButton(char *tok, char *username) {
+void addButton(char *tok, char *username, char *streamname, char *messagenum) {
     char *namePtr = strstr(tok, "name="), *linkPtr = strstr(tok, "link=");
     if(namePtr == NULL || linkPtr == NULL) return;
     namePtr +=6;
@@ -239,6 +255,12 @@ void addButton(char *tok, char *username) {
     char *hInput = strstr(tok, "hInput=1");
     if(hInput != NULL) {
         printf("\" method=\"post\">\n\t<input type=\"hidden\" name=\"username\" value=\"%s\">\n", username);
+        if(strcmp(streamname, "STREAM_NULL") != 0) {
+            printf("\n\t<input type=\"hidden\" name=\"streamChoice\" value=\"%s\">\n", streamname);
+        }
+        if(strcmp(messagenum, "NULL_MSG") != 0) {
+            printf("\n\t<input type=\"hidden\" name=\"messageNum\" value=\"%s\">\n", messagenum);
+        }
     } else {
         printf("\">\n\t");
     }

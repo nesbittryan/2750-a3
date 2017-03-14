@@ -1,0 +1,19 @@
+<style>
+* {
+    background-color: #D7CEC7;
+}
+form {
+    display:inline;
+    margin: 20px;
+    color: #565656;
+}
+h1,h2,h3,h4,h5,h6 {
+    color: #76323F;
+}
+</style>
+.h(text="CIS2750 Messaging System").d()
+.b(name="Home",link="home.php",hInput=1)
+.b(name="Add/Remove Author",link="addremoveAuthor.php",hInput=1)
+.b(name="New Post",link="addPost.php",hInput=1).b(name="Select Stream",link="selectStream.php",hInput=1)
+.b(name="Logout",link="index.php")
+.d()

@@ -114,6 +114,7 @@ int main(int argc, char ** argv) {
         strcat(text, argv[i]);
         ++i;
     }
+    strcat(text, "\n");
     struct userPost up;
     class PostEntry myPost;
     myPost.getTimeDate(&date[0]);

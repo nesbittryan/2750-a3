@@ -2,17 +2,6 @@
 import os, sys, curses
 from datetime import datetime
 
-def getUsername(inputArgs):
-    if len(inputArgs) <= 1:
-        print ("Please include a username...")
-        exit()
-    username = " ";
-    for word in inputArgs:
-        if word != "./view.py":
-            username = username + " " + word
-    username = username.lstrip()
-    return username
-
 def createStreamList():
     streamList = []
     streamListFile = open("messages/streamList", "r")
@@ -28,7 +17,7 @@ def createPermissionList(username, streamList):
         userFileName = "messages/" + word + "UserStream"
         userListFile = open(userFileName, "r")
         for line in userListFile:
-            if username == line.strip(" \n0123456789"):
+            if username.strip() == line.strip(" \n0123456789"):
                 flag = 1
                 userPermissionStreamList.append(word)
     if flag == 0:
@@ -36,28 +25,10 @@ def createPermissionList(username, streamList):
         exit()
     return userPermissionStreamList
 
-def getStreamChoice(userPermissionStreamList):
-    userChoice = input()
-    properInputFlag = "none"
-    #if user selects all
-    if userChoice.strip() == "all":
-        properInputFlag = "all"
-    # else
-    else:
-        for word in userPermissionStreamList:
-            if(userChoice.strip() == word.strip()):
-                properInputFlag = word.strip()
-
-    if properInputFlag == "none":
-        print ("Invalid stream choice, choose from the list...")
-        exit()
-
-    return properInputFlag
-
 def getReadMessages(username, outFileUserName):
     fPtr = open(outFileUserName, "r")
     for line in fPtr:
-        if line.strip(" \n0123456789") == username:
+        if line.strip(" \n0123456789") == username.strip():
             for s in line.split():
                 if s.isdigit():
                     fPtr.close()
@@ -94,7 +65,6 @@ def getToPrint(readList, unreadList, streamname, username):
             count = count + 1
 
     fPtr.close()
-
     return readList, unreadList
 
 def sortByDate(myList):
@@ -219,125 +189,155 @@ def getLastItem(myList):
 
 def main():
     #checking for valid username, and placing it into variable
-    username = getUsername(sys.argv)
+    streamname = ""
+    username = ""
+    readNum = 0
+    if sys.argv[1] != "STREAM_NAME:":
+        for word in sys.argv:
+            if word != "./view.py":
+                username = username + " " + word
+        username = username.lstrip()
+        # creating list of all streams
+        streamList = createStreamList()
+        # checking each user file for a list of streams they are associated with
+        userPermissionStreamList = createPermissionList(username, streamList)
+        print ("<form action=\"home.php\" method=\"post\">\n")
+        print ("\t<input type=\"hidden\" name=\"username\" value=\""+ username +"\">\n")
+        i = 0
+        for word in userPermissionStreamList:
+            print (word +"<input type=\"radio\" name=\"streamChoice\"")
+            print (" value =\"" + word + "\"")
+            if i == 0:
+                print ("checked>")
+            else:
+                print (">")
+            i = i + 1
+        print ("all<input type=\"radio\" name=\"streamChoice\" value =\"all\"")
+        if i == 0:
+            print ("checked>")
+        else:
+            print (">")
+        print ("\t<input type=\"submit\" value=\"submit\">\n</form>\n")
+    streamname = sys.argv[2]
+    readNum = int(sys.argv[3])
+    i = 0
+    for word in sys.argv:
+        if i > 3:
+            username = username +" "+ word
+        i = i + 1
     # creating list of all streams
     streamList = createStreamList()
     # checking each user file for a list of streams they are associated with
     userPermissionStreamList = createPermissionList(username, streamList)
 
-    # printing all options user has permission for
-    for word in userPermissionStreamList:
-        print (word.strip(), end=' ')
-    print ("all")
-
     # check which stream they would like to view
-    inputFlag = getStreamChoice(userPermissionStreamList)
+    inputFlag = streamname.strip()
 
-    # init curses
-    window = curses.initscr()
-    #curses.start_color()
-    curses.noecho()
-    window = curses.newwin(24, 80, 0, 0)
-
-    # looping and printing
     unreadList = []
-    mode = "chrono"
     readList = []
-    currentLineNumber = 0
-    updateListFlag = 1
-    needToPrint = 1
-    while True:
-        if inputFlag == "all" and updateListFlag == 1:
-            unreadList = []
-            readList = []
+    mode = "chrono"
+
+    if inputFlag != "all":
+        readList, unReadList = getToPrint(readList, unreadList, inputFlag, username)
+        if readNum == -1:
+            readNum = 0;
+            for line in readList:
+                if "Stream:" in line:
+                    readNum = readNum + 1
+        allList = readList + unreadList;
+        msg = -1
+        for item in allList:
+            if "Stream:" in item:
+                msg = msg + 1
+            if msg == readNum:
+                print(item + "<br>")
+                if "Date:" in item:
+                    print("---------------------------------------<br>")
+    return()
+#############################################################################################
+    if inputFlag == "all" and updateListFlag == 1:
+        unreadList = []
+        readList = []
+        for stream in userPermissionStreamList:
+            readList, unReadList = getToPrint(readList, unreadList, stream, username)
+        currentLineNumber = getLastItem(readList)
+        if mode == "author":
+            readList = sortByAuthor(readList, unreadList)
+            currentLineNumber = 0
+        else:
+            readList = sortByDate(readList)
+            unreadList = sortByDate(unreadList)
+        if not unreadList:
+            currentLineNumber = 0
+        updateListFlag = 0
+        needToPrint = 1
+    elif updateListFlag == 1:
+        unreadList = []
+        readList = []
+        readList, unReadList = getToPrint(readList, unreadList, inputFlag, username)
+        currentLineNumber = getLastItem(readList)
+        if mode == "author":
+            readList = sortByAuthor(readList, unreadList)
+            currentLineNumber = 0
+        else:
+            readList = sortByDate(readList)
+            unreadList = sortByDate(unreadList)
+        if not unreadList:
+            currentLineNumber = 0
+        updateListFlag = 0
+        needToPrint = 1
+
+    #add update read messages
+    if inputFlag == "all" and mode == "chrono":
+        for stream in userPermissionStreamList:
+            updateReadMessages(stream, username, currentLineNumber, unreadList, readList)
+    elif mode == "chrono":
+        updateReadMessages(inputFlag, username, currentLineNumber, unreadList, readList)
+
+    # determines if it needs to print if a certain action is taken
+    if needToPrint == 1:
+        printToWindow(window, readList, unreadList, currentLineNumber)
+        window.addstr(23, 0, "Page Up   Page Down   O-order toggle   M-mark all   S-stream   C-check for new")
+    needToPrint = 0
+
+    c = window.getch()
+    if c == 65:
+        currentLineNumber = currentLineNumber - 23;
+        if currentLineNumber < 0:
+            currentLineNumber = 0
+        needToPrint = 1
+    elif c == 66:
+        currentLineNumber = currentLineNumber + 23;
+        maxline = getLastLine(readList, unreadList)
+        if currentLineNumber >= int(maxline):
+            currentLineNumber = currentLineNumber - 23
+        needToPrint = 1
+    elif c == ord('o') or c == ord('O'):
+        if mode == "author":
+            mode = "chrono"
+        else:
+            mode = "author"
+        updateListFlag = 1
+    elif c == ord('m') or c == ord('M'):
+        if inputFlag == "all":
             for stream in userPermissionStreamList:
-                readList, unReadList = getToPrint(readList, unreadList, stream, username)
-            currentLineNumber = getLastItem(readList)
-            if mode == "author":
-                readList = sortByAuthor(readList, unreadList)
-                currentLineNumber = 0
-            else:
-                readList = sortByDate(readList)
-                unreadList = sortByDate(unreadList)
-            if not unreadList:
-                currentLineNumber = 0
-            updateListFlag = 0
-            needToPrint = 1
-        elif updateListFlag == 1:
-            unreadList = []
-            readList = []
-            readList, unReadList = getToPrint(readList, unreadList, inputFlag, username)
-            currentLineNumber = getLastItem(readList)
-            if mode == "author":
-                readList = sortByAuthor(readList, unreadList)
-                currentLineNumber = 0
-            else:
-                readList = sortByDate(readList)
-                unreadList = sortByDate(unreadList)
-            if not unreadList:
-                currentLineNumber = 0
-            updateListFlag = 0
-            needToPrint = 1
-
-        #add update read messages
-        if inputFlag == "all" and mode == "chrono":
-            for stream in userPermissionStreamList:
-                updateReadMessages(stream, username, currentLineNumber, unreadList, readList)
-        elif mode == "chrono":
-            updateReadMessages(inputFlag, username, currentLineNumber, unreadList, readList)
-
-        # determines if it needs to print if a certain action is taken
-        if needToPrint == 1:
-            printToWindow(window, readList, unreadList, currentLineNumber)
-            window.addstr(23, 0, "Page Up   Page Down   O-order toggle   M-mark all   S-stream   C-check for new")
-            needToPrint = 0
-
-        c = window.getch()
-        if c == 65:
-            currentLineNumber = currentLineNumber - 23;
-            if currentLineNumber < 0:
-                currentLineNumber = 0
-            needToPrint = 1
-        elif c == 66:
-            currentLineNumber = currentLineNumber + 23;
-            maxline = getLastLine(readList, unreadList)
-            if currentLineNumber >= int(maxline):
-                currentLineNumber = currentLineNumber - 23
-            needToPrint = 1
-        elif c == ord('o') or c == ord('O'):
-            if mode == "author":
-                mode = "chrono"
-            else:
-                mode = "author"
-            updateListFlag = 1
-        elif c == ord('m') or c == ord('M'):
-            if inputFlag == "all":
-                for stream in userPermissionStreamList:
-                    markAllRead(username, stream)
-            else:
-                markAllRead(username, inputFlag)
-            updateListFlag = 1
-        elif c == ord('s') or c == ord('S'):
-            updateListFlag = 1
-            curses.echo()
-            curses.endwin()
-            for word in userPermissionStreamList:
-                print (word.strip(), end=' ')
-            print ("all")
-            inputFlag = getStreamChoice(userPermissionStreamList)
-            window = curses.initscr()
-            curses.noecho()
-            window = curses.newwin(24, 80, 0, 0)
-        elif c == ord('c') or c == ord('C'):
-            updateListFlag = 1
-        elif c == ord('q') or c == ord('Q'):
-            break  # Exit the while loop
-
-        window.refresh()
-
-    # terminating curses
-    curses.echo()
-    curses.endwin()
+                markAllRead(username, stream)
+        else:
+            markAllRead(username, inputFlag)
+        updateListFlag = 1
+    elif c == ord('s') or c == ord('S'):
+        updateListFlag = 1
+        curses.echo()
+        curses.endwin()
+        for word in userPermissionStreamList:
+            print (word.strip(), end=' ')
+        print ("all")
+        inputFlag = getStreamChoice(userPermissionStreamList)
+        window = curses.initscr()
+        curses.noecho()
+        window = curses.newwin(24, 80, 0, 0)
+    elif c == ord('c') or c == ord('C'):
+        updateListFlag = 1
 
 if __name__ == "__main__":
     main()

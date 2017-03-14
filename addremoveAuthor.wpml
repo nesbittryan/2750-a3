@@ -1,7 +1,2 @@
-.h(text="HOME").d()
-.b(name="Home",link="home.php",hInput=1)
-.b(name="Add/Remove Author",link="addremoveAuthor.php",hInput=1)
-.b(name="New Post",link="addPost.php",hInput=1).b(name="Select Stream",link="https://www.google.ca/",hInput=1)
-.b(name="Logout",link="index.php")
-.d()
+.h(text="Add/Remove Authors").d()
 .i(action="processAddRemoveAuthor.php",hInput=1,text="Author Name:",name="author",value="Default",text=" Add/Remove: ",name="flag",value="add",text=" Streams[,]:",name="streamlist",value="DefaultStream")

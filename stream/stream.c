@@ -21,7 +21,7 @@ void updateStream(struct userPost *st) {
 
     streamFile = fopen(streamFilename, "r");
     if(streamFile == NULL) {
-        printf("Steam <%s> does not exist, exiting...\n", st->streamname);
+        printf("<br>Steam %s does not exist, exiting...<br>", st->streamname);
         free(streamFilename);
         free(userStreamFilename);
         free(streamDataFilename);
@@ -83,10 +83,10 @@ void updateStream(struct userPost *st) {
         streamDataFile = fopen(streamDataFilename, "a+");   /* FINISH STREAM DATA FILE */
         fprintf(streamDataFile, "%d\n", count);
         fclose(streamDataFile);
-        printf("Message posted\n");
+        printf("<br>Message posted<br>");
 
     } else {
-        printf("%s does not have permission for stream <%s>...\n", st->username, st->streamname);
+        printf("<br>%s does not have permission for stream %s...<br>", st->username, st->streamname);
     }
     free(streamFilename);
     free(userStreamFilename);
@@ -112,7 +112,7 @@ void addUser(char *username, char *list) {
             streamList = fopen("messages/streamList", "a+");
             fprintf(streamList, "%s\n", token);
             fclose(streamList);
-            printf("Creating stream <%s>...\n", token);
+            printf("<br>Creating stream %s...<br>", token);
             char * streamName = malloc(sizeof(char) * strlen(list) + 20);
             strcpy(streamName, "messages/");
             strcat(streamName,  token);
@@ -142,7 +142,7 @@ void addUser(char *username, char *list) {
                     }
                 }
                 if(strcmp(copyStr, username) == 0) {
-                    printf("%s already has access to %s, aborting...\n", username, token);
+                    printf("<br>%s already has access to %s, aborting...<br>", username, token);
                     flag = 1;
                 }
                 free(copyStr);
@@ -154,7 +154,7 @@ void addUser(char *username, char *list) {
             /* adding user to end of file */
             fprintf(userStreamFile, "%s 0\n", username);
             fclose(userStreamFile);
-            printf("%s added to stream <%s>...\n", username, token);
+            printf("<br>%s added to stream %s...<br>", username, token);
         }
         free(filename);
         token = strtok(NULL, ",");
@@ -194,20 +194,20 @@ void removeUser(char *username, char *list) {
                 if(strcmp(copyStr, username) != 0) {
                     fprintf(copy, "%s", str);
                 } else {
-                    printf("Removing %s\n", username);
+                    printf("<br>Removing %s<br>", username);
                     flag = 1;
                 }
                 free(copyStr);
             }
             if(flag == 0) {
-                printf("%s not found \n",username);
+                printf("<br>%s not found <br>",username);
             }
             rename("messages/copy", filename);
             fclose(copy);
             fclose(userStreamFile);
         } else {
             /* STREAM DOES NOT EXIST */
-            printf("<%s> Does not exist...\n", token);
+            printf("<br>%s Does not exist...<br>", token);
         }
         free(filename);
         token = strtok(NULL, ",");

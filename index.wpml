@@ -1,2 +1,15 @@
+<style>
+* {
+    background-color: #D7CEC7;
+}
+form {
+    display:inline;
+    margin: 20px;
+    color: #565656;
+}
+h1 {
+    color: #76323F;
+}
+</style>
 .h(text="CIS2750 Messaging Service",size=1).d()
 .i(action="home.php",text="Username: ",name="username",value="Default")
