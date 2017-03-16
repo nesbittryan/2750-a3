@@ -97,6 +97,11 @@ class PostEntry {
 
 int main(int argc, char ** argv) {
 
+    if(argc < 5) {
+        printf("USAGE: ./post streamname username[multiple words] MESSAGE_TEXT Message[multiple words]\n");
+        printf("ie. ./post s1 Ryan Nesbitt MESSAGE_TEXT Hello this is my message\n");
+        return(-1);
+    }
     int i = 3;
     char name[100], stream[100], text[1000], date[100];
     strcpy(stream, argv[1]);

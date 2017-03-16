@@ -12,8 +12,10 @@ def createStreamList():
 
 def createPermissionList(username, streamList):
     userPermissionStreamList = []
+
     flag = 0
     for word in streamList:
+
         userFileName = "messages/" + word + "UserStream"
         userListFile = open(userFileName, "r")
         for line in userListFile:
@@ -22,7 +24,9 @@ def createPermissionList(username, streamList):
                 userPermissionStreamList.append(word)
     if flag == 0:
         print ("User has no permissions...")
-        exit()
+        print ("here1")
+        return userPermissionStreamList
+    print ("here2")
     return userPermissionStreamList
 
 def getReadMessages(username, outFileUserName):
@@ -187,18 +191,52 @@ def getLastItem(myList):
         count = count + 1
     return count
 
+def printButtons(username, inputFlag, readNum):
+    print("<form action=\"processChangeMsg.php\" method=\"post\">")
+    print("\n\t<input type=\"hidden\" name=\"username\" value=\""+ username.strip() +"\">\n")
+    print("\n\t<input type=\"hidden\" name=\"streamChoice\" value=\""+ inputFlag + "\">\n")
+    print("\n\t<input type=\"hidden\" name=\"messageNum\" value=\""+ str(readNum-1) +"\">\n")
+    print("\t<input type=\"submit\" value=\"Prev Post\">\n</form>\n")
+
+    print("<form action=\"processChangeMsg.php\" method=\"post\">")
+    print("\n\t<input type=\"hidden\" name=\"username\" value=\""+ username.strip() +"\">\n")
+    print("\n\t<input type=\"hidden\" name=\"streamChoice\" value=\""+ inputFlag + "\">\n")
+    print("\n\t<input type=\"hidden\" name=\"messageNum\" value=\""+ str(readNum+1) +"\">\n")
+    print("\t<input type=\"submit\" value=\"Next Post\">\n</form>\n")
+
+    print("<form action=\"processChangeMsg.php\" method=\"post\">")
+    print("\n\t<input type=\"hidden\" name=\"username\" value=\""+ username.strip() +"\">\n")
+    print("\n\t<input type=\"hidden\" name=\"streamChoice\" value=\""+ inputFlag + "\">\n")
+    print("\n\t<input type=\"hidden\" name=\"messageNum\" value=\"-1\">\n")
+    print("\t<input type=\"submit\" value=\"Mark all Read\">\n</form>\n")
+
+    print("<form action=\"processChangeMsg.php\" method=\"post\">")
+    print("\n\t<input type=\"hidden\" name=\"username\" value=\""+ username.strip() +"\">\n")
+    print("\n\t<input type=\"hidden\" name=\"streamChoice\" value=\""+ inputFlag + "\">\n")
+    print("\n\t<input type=\"hidden\" name=\"messageNum\" value=\"-1\">\n")
+    print("\t<input type=\"submit\" value=\"Sorting\">\n</form>\n")
+
+    print("<form action=\"processChangeMsg.php\" method=\"post\">")
+    print("\n\t<input type=\"hidden\" name=\"username\" value=\""+ username.strip() +"\">\n")
+    print("\n\t<input type=\"hidden\" name=\"streamChoice\" value=\""+ inputFlag + "\">\n")
+    print("\n\t<input type=\"hidden\" name=\"messageNum\" value=\"-1\">\n")
+    print("\t<input type=\"submit\" value=\"Check for New\">\n</form>\n")
+
 def main():
     #checking for valid username, and placing it into variable
+
     streamname = ""
     username = ""
     readNum = 0
     if sys.argv[1] != "STREAM_NAME:":
+
         for word in sys.argv:
             if word != "./view.py":
                 username = username + " " + word
         username = username.lstrip()
         # creating list of all streams
         streamList = createStreamList()
+
         # checking each user file for a list of streams they are associated with
         userPermissionStreamList = createPermissionList(username, streamList)
         print ("<form action=\"home.php\" method=\"post\">\n")
@@ -218,6 +256,7 @@ def main():
         else:
             print (">")
         print ("\t<input type=\"submit\" value=\"submit\">\n</form>\n")
+        return()
     streamname = sys.argv[2]
     readNum = int(sys.argv[3])
     i = 0
@@ -236,9 +275,28 @@ def main():
     unreadList = []
     readList = []
     mode = "chrono"
-
+    printButtons(username, inputFlag, readNum)
+    print("<br><br><p>")
     if inputFlag != "all":
         readList, unReadList = getToPrint(readList, unreadList, inputFlag, username)
+        if readNum == -1:
+            readNum = 0;
+            for line in readList:
+                if "Stream:" in line:
+                    readNum = readNum + 1
+        allList = readList + unreadList;
+        msg = -1
+
+        for item in allList:
+            if "Stream:" in item:
+                msg = msg + 1
+            if msg == readNum:
+                print(item + "<br>")
+                if "Date:" in item:
+                    print("---------------------------------------<br>")
+    else:
+        for item in userPermissionStreamList:
+            readList, unReadList = getToPrint(readList, unreadList, item, username)
         if readNum == -1:
             readNum = 0;
             for line in readList:
@@ -253,6 +311,7 @@ def main():
                 print(item + "<br>")
                 if "Date:" in item:
                     print("---------------------------------------<br>")
+    print("</p>")
     return()
 #############################################################################################
     if inputFlag == "all" and updateListFlag == 1:

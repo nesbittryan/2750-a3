@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS = -ansi -Wall -g
 
-all: post addauthor view creator
+all: post addauthor creator
 
 post: stream/post.cc libstream.a
 	$(CC) $(CFLAGS) converter/converter.c -o converter/c
@@ -21,9 +21,6 @@ libstream.a: stream/stream.c stream/stream.h
 	$(CC) -c stream/stream.c -o stream/stream.o
 	ar cr libstream.a stream/stream.o
 	rm stream/*.o
-
-view: view.py
-	chmod +x view.py
 
 creator: siteCreator.c
 	$(CC) $(CFLAGS) siteCreator.c -o sc

@@ -27,12 +27,16 @@ void addRadioButton(char *tok, char *username, char *streamname, char *messagenu
 void addExe(char *tok);
 
 int main(int argc, char **argv) {
-    if(argc < 3) {
-        printf("Include Filename and Username\n");
+    if(argc < 5) {
+        printf("USAGE: ./sc filename.wpml STREAMNAME MESSAGENUM USERNAME\n");
+        printf("(Use STREAM_NULL, MSG_NULL, and NAME_NULL if not applicable)\n");
+        printf("ie. ./sc filename.wpml STREAM_NULL MSG_NULL NAME_NULL\n");
         return(-1);
     }
-    char *filename = malloc(strlen(argv[1]) + 1);
-    strcpy(filename, argv[1]);
+    int i = 1;
+    char *filename = malloc(strlen(argv[i]) + 1);
+    strcpy(filename, argv[i]);
+    ++i;
     char *buffer = malloc(sizeof(char) * 1000);
     FILE *fp = fopen(filename, "r");
     if(fp == NULL) {
@@ -42,9 +46,11 @@ int main(int argc, char **argv) {
     char username[500];
     char streamname[50];
     char messagenum[50];
-    strcpy(streamname, argv[2]);
-    strcpy(messagenum, argv[3]);
-    int i = 4;
+
+    strcpy(streamname, argv[i]);
+    ++i;
+    strcpy(messagenum, argv[i]);
+    ++i;
     strcpy(username, argv[i]);
     ++i;
     while(argv[i] != NULL) {
@@ -52,7 +58,6 @@ int main(int argc, char **argv) {
         strcat(username, argv[i]);
         ++i;
     }
-
     printf("<html>\n");
 
     while(fgets(buffer, 999,fp)) {
@@ -150,12 +155,14 @@ void addRadioButton(char *tok, char *username, char *streamname, char *messagenu
     printf( "\" method=\"post\">\n");
     char *hInput = strstr(tok, "hInput=1");
     if(hInput != NULL) {
-        printf("\n\t<input type=\"hidden\" name=\"username\" value=\"%s\">\n", username);
-        if(strcmp(streamname, "STREAM_NULL") != 0) {
-            printf("\n\t<input type=\"hidden\" name=\"streamChoice\" value=\"%s\">\n", streamname);
+        if(strcmp(username, "NAME_NULL") != 0) {
+            printf("\t<input type=\"hidden\" name=\"username\" value=\"%s\">\n", username);
         }
-        if(strcmp(messagenum, "NULL_MSG") != 0) {
-            printf("\n\t<input type=\"hidden\" name=\"messageNum\" value=\"%s\">\n", messagenum);
+        if(strcmp(streamname, "STREAM_NULL") != 0) {
+            printf("\t<input type=\"hidden\" name=\"streamChoice\" value=\"%s\">\n", streamname);
+        }
+        if(strcmp(messagenum, "MSG_NULL") != 0) {
+            printf("\t<input type=\"hidden\" name=\"messageNum\" value=\"%s\">\n", messagenum);
         }
     }
     nameptr = strstr(tok, "name=");
@@ -205,12 +212,14 @@ void addInput(char *tok, char *username, char *streamname, char *messagenum) {
     }
     printf("\" method=\"post\">\n");
     if(hInput != NULL) {
-        printf("\n\t<input type=\"hidden\" name=\"username\" value=\"%s\">\n", username);
-        if(strcmp(streamname, "STREAM_NULL") != 0) {
-            printf("\n\t<input type=\"hidden\" name=\"streamChoice\" value=\"%s\">\n", streamname);
+        if(strcmp(username, "NAME_NULL") != 0) {
+            printf("\t<input type=\"hidden\" name=\"username\" value=\"%s\">\n", username);
         }
-        if(strcmp(messagenum, "NULL_MSG") != 0) {
-            printf("\n\t<input type=\"hidden\" name=\"messageNum\" value=\"%s\">\n", messagenum);
+        if(strcmp(streamname, "STREAM_NULL") != 0) {
+            printf("\t<input type=\"hidden\" name=\"streamChoice\" value=\"%s\">\n", streamname);
+        }
+        if(strcmp(messagenum, "MSG_NULL") != 0) {
+            printf("\t<input type=\"hidden\" name=\"messageNum\" value=\"%s\">\n", messagenum);
         }
     }
     while((textptr = strstr(tok, "text=")) != NULL) {
@@ -254,12 +263,15 @@ void addButton(char *tok, char *username, char *streamname, char *messagenum) {
     }
     char *hInput = strstr(tok, "hInput=1");
     if(hInput != NULL) {
-        printf("\" method=\"post\">\n\t<input type=\"hidden\" name=\"username\" value=\"%s\">\n", username);
-        if(strcmp(streamname, "STREAM_NULL") != 0) {
-            printf("\n\t<input type=\"hidden\" name=\"streamChoice\" value=\"%s\">\n", streamname);
+        printf("\" method=\"post\">\n");
+        if(strcmp(username, "NAME_NULL") != 0) {
+            printf("\t<input type=\"hidden\" name=\"username\" value=\"%s\">\n", username);
         }
-        if(strcmp(messagenum, "NULL_MSG") != 0) {
-            printf("\n\t<input type=\"hidden\" name=\"messageNum\" value=\"%s\">\n", messagenum);
+        if(strcmp(streamname, "STREAM_NULL") != 0) {
+            printf("\t<input type=\"hidden\" name=\"streamChoice\" value=\"%s\">\n", streamname);
+        }
+        if(strcmp(messagenum, "MSG_NULL") != 0) {
+            printf("\t<input type=\"hidden\" name=\"messageNum\" value=\"%s\">\n", messagenum);
         }
     } else {
         printf("\">\n\t");
