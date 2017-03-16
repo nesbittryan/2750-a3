@@ -17,7 +17,7 @@ if((isset($streamChoice)) and ($streamChoice != "NULL_STREAM")) {
         echo "$line";
     }
     echo "<br>";
-    exec("./view.py STREAM_NAME: $streamChoice -1 0 $username", $displayMsg);
+    exec("./view.py STREAM_NAME $streamChoice -1 0 $username", $displayMsg);
     foreach($displayMsg as $line) {
         echo "$line";
     }

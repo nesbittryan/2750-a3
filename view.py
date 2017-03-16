@@ -219,11 +219,12 @@ def main():
     streamname = ""
     username = ""
     readNum = 0
-    if sys.argv[1] != "STREAM_NAME:":
-
+    if sys.argv[1] != "STREAM_NAME":
+        tempVar = 0
         for word in sys.argv:
-            if word != "./view.py":
+            if tempVar != 0:
                 username = username + " " + word
+            tempVar = tempVar + 1
         username = username.lstrip()
         # creating list of all streams
         streamList = createStreamList()

@@ -21,7 +21,7 @@ if((isset($streamChoice)) and ($streamChoice != "NULL_STREAM")) {
         echo "$line";
     }
     echo "<br>";
-    exec("./view.py STREAM_NAME: $streamChoice $messageNum $sorting $username", $displayMsg);
+    exec("./view.py STREAM_NAME $streamChoice $messageNum $sorting $username", $displayMsg);
     foreach($displayMsg as $line) {
         echo "$line";
     }
