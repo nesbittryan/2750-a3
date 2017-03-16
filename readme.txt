@@ -3,11 +3,14 @@ CIS*2750 Assignment 3
 Created By: Ryan Nesbitt
 ID: 0915819
 
-Assumptions I made about the assignment:
+Assumptions/Limitations I made about the assignment:
     That adding style elements to help improve website look was okay into the config files was okay
-    That I can set up the usage for my programs in a way i see fit
+    That I can set up the usage for my programs in a way I see fit
+    Text entered by users can not contain double quotes, as they will mess up the php
 
-HOW TO USE EACH EXECUTABLE BY COMMAND LINE:
+    That the TA marking this has mercy for my soul
+
+HOW TO USE EACH EXECUTABLE BY COMMAND LINE (ignore if only using web interface):
     Site converter C file (without the quotes):
 
         "./<path/>sc <filename.wpml> Streamname MessageNum Username"
