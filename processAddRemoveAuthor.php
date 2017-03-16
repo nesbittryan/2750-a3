@@ -7,11 +7,11 @@ $streamlist = $_POST["streamlist"];
 exec("./stream/addauthor $flag $author $streamlist", $status);
 
 echo "Currently logged in as: $username<br>";
-exec("./sc header.wpml NULL_STREAM NULL_MSG $username", $header);
+exec("./sc header.wpml STREAM_NULL MSG_NULL $username", $header);
 foreach($header as $line) {
     echo "$line";
 }
-exec("./sc addremoveAuthor.wpml NULL_STREAM NULL_MSG $username", $return);
+exec("./sc addremoveAuthor.wpml STREAM_NULL MSG_NULL $username", $return);
 foreach($return as $line) {
     echo "$line";
 }

@@ -1,7 +1,7 @@
 <?php
 $username = $_POST['username'];
 echo "Currently logged in as: $username<br>";
-exec("./sc header.wpml NULL_STREAM NULL_MSG $username", $header);
+exec("./sc header.wpml STREAM_NULL MSG_NULL $username", $header);
 foreach($header as $line) {
     echo "$line";
 }

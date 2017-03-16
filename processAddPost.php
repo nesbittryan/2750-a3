@@ -6,11 +6,11 @@ $message = $_POST["message"];
 exec("./stream/post $stream $username MESSAGE_TEXT $message", $status);
 
 echo "Currently logged in as: $username<br>";
-exec("./sc header.wpml NULL_STREAM NULL_MSG $username", $header);
+exec("./sc header.wpml STREAM_NULL MSG_NULL $username", $header);
 foreach($header as $line) {
     echo "$line";
 }
-exec("./sc addPost.wpml NULL_STREAM NULL_MSG $username", $return);
+exec("./sc addPost.wpml STREAM_NULL MSG_NULL $username", $return);
 foreach($return as $line) {
     echo "$line";
 }
