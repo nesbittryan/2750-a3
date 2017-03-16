@@ -110,27 +110,6 @@ def sortByAuthor(readList, unreadList):
             finalList.append(item)
     return finalList
 
-def printToWindow(window, readList, unreadList, currentLineNumber):
-    window.clear()
-    allList = readList + unreadList
-    count = 0
-    currentLines = 0
-    for line in allList:
-        if(count < int(currentLineNumber)):
-            count = count + 1
-            continue
-        if currentLines < 23 :
-            window.addstr(line)
-            currentLines = currentLines + 1
-            count = count + 1
-
-def getLastLine(readList, unreadList):
-    allList = unreadList + readList
-    count = 0
-    for line in allList:
-        count = count + 1
-    return count
-
 def markAllRead(username, streamname):
     outFileDataName = "messages/" + streamname + "StreamData"
     outFileUserName = "messages/" + streamname + "UserStream"
@@ -171,8 +150,7 @@ def updateReadMessages(streamname, username, readNum, limit):
     fpcopy.close()
     os.rename("copy", outFileUserName)
 
-def printButtons(username, inputFlag, readNum, limit):
-
+def printButtons(username, inputFlag, readNum, limit, sortFlag):
     print("<form action=\"processChangeMsg.php\" method=\"post\">")
     print("\n\t<input type=\"hidden\" name=\"username\" value=\""+ username.strip() +"\">\n")
     print("\n\t<input type=\"hidden\" name=\"streamChoice\" value=\""+ inputFlag + "\">\n")
@@ -180,6 +158,7 @@ def printButtons(username, inputFlag, readNum, limit):
         print("\n\t<input type=\"hidden\" name=\"messageNum\" value=\""+ str(readNum-1) +"\">\n")
     else:
         print("\n\t<input type=\"hidden\" name=\"messageNum\" value=\""+ str(readNum) +"\">\n")
+    print("\n\t<input type=\"hidden\" name=\"sorting\" value=\""+ str(sortFlag) + "\">\n")
     print("\t<input type=\"submit\" value=\"Prev Post\">\n</form>\n")
 
     print("<form action=\"processChangeMsg.php\" method=\"post\">")
@@ -192,24 +171,31 @@ def printButtons(username, inputFlag, readNum, limit):
             print("\n\t<input type=\"hidden\" name=\"messageNum\" value=\""+ str(readNum+1) +"\">\n")
     else:
         print("\n\t<input type=\"hidden\" name=\"messageNum\" value=\""+ str(readNum) +"\">\n")
+    print("\n\t<input type=\"hidden\" name=\"sorting\" value=\""+ str(sortFlag) + "\">\n")
     print("\t<input type=\"submit\" value=\"Next Post\">\n</form>\n")
 
     print("<form action=\"processChangeMsg.php\" method=\"post\">")
     print("\n\t<input type=\"hidden\" name=\"username\" value=\""+ username.strip() +"\">\n")
     print("\n\t<input type=\"hidden\" name=\"streamChoice\" value=\""+ inputFlag + "\">\n")
-    print("\n\t<input type=\"hidden\" name=\"messageNum\" value=\"-1\">\n")
+    print("\n\t<input type=\"hidden\" name=\"messageNum\" value=\"-2\">\n")
+    print("\n\t<input type=\"hidden\" name=\"sorting\" value=\""+ str(sortFlag) + "\">\n")
     print("\t<input type=\"submit\" value=\"Mark all Read\">\n</form>\n")
 
     print("<form action=\"processChangeMsg.php\" method=\"post\">")
     print("\n\t<input type=\"hidden\" name=\"username\" value=\""+ username.strip() +"\">\n")
     print("\n\t<input type=\"hidden\" name=\"streamChoice\" value=\""+ inputFlag + "\">\n")
     print("\n\t<input type=\"hidden\" name=\"messageNum\" value=\"-1\">\n")
+    if sortFlag == 1:
+        print("\n\t<input type=\"hidden\" name=\"sorting\" value=\"0\">\n")
+    else:
+        print("\n\t<input type=\"hidden\" name=\"sorting\" value=\"1\">\n")
     print("\t<input type=\"submit\" value=\"Sorting\">\n</form>\n")
 
     print("<form action=\"processChangeMsg.php\" method=\"post\">")
     print("\n\t<input type=\"hidden\" name=\"username\" value=\""+ username.strip() +"\">\n")
     print("\n\t<input type=\"hidden\" name=\"streamChoice\" value=\""+ inputFlag + "\">\n")
     print("\n\t<input type=\"hidden\" name=\"messageNum\" value=\"-1\">\n")
+    print("\n\t<input type=\"hidden\" name=\"sorting\" value=\""+ str(sortFlag) + "\">\n")
     print("\t<input type=\"submit\" value=\"Check for New\">\n</form>\n")
 
 def getLimit(inputFlag, userStreamList):
@@ -265,9 +251,10 @@ def main():
 
     streamname = sys.argv[2]
     readNum = int(sys.argv[3])
+    sortFlag = int(sys.argv[4])
     i = 0
     for word in sys.argv:
-        if i > 3:
+        if i > 4:
             username = username +" "+ word
         i = i + 1
 
@@ -283,19 +270,82 @@ def main():
     readList = []
     mode = "chrono"
     limit = 0
-    limit = getLimit(inputFlag, userPermissionStreamList) + limit;
 
-    if inputFlag != "all":
+    if inputFlag != "all" and int(sortFlag) == 0:
+        limit = getLimit(inputFlag, userPermissionStreamList) + limit;
+        if readNum == -2:
+            markAllRead(username, inputFlag)
+            readNum = -1
         readList, unReadList = getToPrint(readList, unreadList, inputFlag, username)
         if readNum == -1:
             readNum = 0;
             for line in readList:
                 if "Stream:" in line:
                     readNum = readNum + 1
+        if readNum == limit:
+            readNum = readNum - 1
         allList = readList + unreadList;
+        #allList = sortByDate(allList);
         msg = -1
         updateReadMessages(inputFlag, username, readNum, limit)
-        printButtons(username, inputFlag, readNum, limit)
+        printButtons(username, inputFlag, readNum, limit, sortFlag)
+        print("<br>")
+        print("<p>")
+        for item in allList:
+            if "Stream:" in item:
+                msg = msg + 1
+            if msg == readNum:
+                print(item + "<br>")
+                if "Date:" in item:
+                    print("---------------------------------------<br>")
+        print("</p>")
+    elif inputFlag == "all" and int(sortFlag) == 0:
+
+        for item in userPermissionStreamList:
+            if readNum == -2:
+                markAllRead(username, item)
+            readList, unReadList = getToPrint(readList, unreadList, item, username)
+            limit = getLimit(item, userPermissionStreamList) + limit
+        if readNum == -2:
+            readNum = -1
+        if readNum == -1:
+            readNum = 0;
+            for line in readList:
+                if "Stream:" in line:
+                    readNum = readNum + 1
+        if readNum == limit:
+            readNum = readNum - 1
+        allList = readList + unreadList;
+        #allList = sortByDate(allList);
+        msg = -1
+        printButtons(username, inputFlag, readNum, limit, sortFlag)
+        print("<br>")
+        print("<p>")
+        for item in allList:
+            if "Stream:" in item:
+                msg = msg + 1
+            if msg == readNum:
+                print(item + "<br>")
+                if "Date:" in item:
+                    print("---------------------------------------<br>")
+        print("</p>")
+    elif inputFlag != "all" and int(sortFlag) == 1:
+        limit = getLimit(inputFlag, userPermissionStreamList) + limit;
+        if readNum == -2:
+            markAllRead(username, inputFlag)
+            readNum = -1
+        readList, unReadList = getToPrint(readList, unreadList, inputFlag, username)
+        if readNum == -1:
+            readNum = 0;
+            for line in readList:
+                if "Stream:" in line:
+                    readNum = readNum + 1
+        if readNum == limit:
+            readNum = readNum - 1
+        allList = readList + unreadList;
+        allList = sortByAuthor(allList);
+        msg = -1
+        printButtons(username, inputFlag, readNum, limit, sortFlag)
         print("<br>")
         print("<p>")
         for item in allList:
@@ -309,14 +359,18 @@ def main():
     else:
         for item in userPermissionStreamList:
             readList, unReadList = getToPrint(readList, unreadList, item, username)
+            limit = getLimit(inputFlag, userPermissionStreamList) + limit;
         if readNum == -1:
             readNum = 0;
             for line in readList:
                 if "Stream:" in line:
                     readNum = readNum + 1
+        if readNum == limit:
+            readNum = readNum - 1
         allList = readList + unreadList;
+        allList = sortByAuthor(allList);
         msg = -1
-        printButtons(username, inputFlag, readNum, limit)
+        printButtons(username, inputFlag, readNum, limit, sortFlag)
         print("<br>")
         print("<p>")
         for item in allList:

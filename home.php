@@ -1,7 +1,7 @@
 <?php
 $username = $_POST['username'];
 $streamChoice = $_POST['streamChoice'];
-$username = "Ryan";
+
 echo "Currently logged in as: $username";
 if((isset($streamChoice)) and ($streamChoice != "NULL_STREAM")) {
     echo ", in Stream: $streamChoice";
@@ -17,7 +17,7 @@ if((isset($streamChoice)) and ($streamChoice != "NULL_STREAM")) {
         echo "$line";
     }
     echo "<br>";
-    exec("./view.py STREAM_NAME: $streamChoice -1 $username", $displayMsg);
+    exec("./view.py STREAM_NAME: $streamChoice -1 0 $username", $displayMsg);
     foreach($displayMsg as $line) {
         echo "$line";
     }

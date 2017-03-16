@@ -3,6 +3,7 @@ $username = $_POST['username'];
 $streamChoice = $_POST['streamChoice'];
 $username = $_POST['username'];
 $messageNum = $_POST['messageNum'];
+$sorting = $_POST['sorting'];
 
 echo "Currently logged in as: $username";
 if((isset($streamChoice)) and ($streamChoice != "NULL_STREAM")) {
@@ -20,7 +21,7 @@ if((isset($streamChoice)) and ($streamChoice != "NULL_STREAM")) {
         echo "$line";
     }
     echo "<br>";
-    exec("./view.py STREAM_NAME: $streamChoice $messageNum $username", $displayMsg);
+    exec("./view.py STREAM_NAME: $streamChoice $messageNum $sorting $username", $displayMsg);
     foreach($displayMsg as $line) {
         echo "$line";
     }
