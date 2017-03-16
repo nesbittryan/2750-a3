@@ -1,7 +1,8 @@
 <?php
-exec("./sc index.wpml STREAM_NULL MSG_NULL NAME_NULL", $return);
+echo "here";
+#exec("./sc index.wpml STREAM_NULL MSG_NULL NAME_NULL", $index);
 
-foreach($return as $line) {
-    echo "$line";
-}
+#foreach($index as $line) {
+#    echo "$line";
+#}
 ?>

@@ -7,5 +7,4 @@ foreach($header as $line) {
     echo "$line";
 }
 
-
 ?>

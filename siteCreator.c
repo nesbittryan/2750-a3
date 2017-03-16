@@ -94,7 +94,7 @@ void parseLine(char *buffer, char * username, char *streamname, char *messagenum
                     addImage(removeSpaces(tok));
                     break;
                 case 'e':
-                    addExe(removeSpaces(tok));  /*FIXME*/
+                    addExe(removeSpaces(tok));
                     break;
                 case 'b':
                     addButton(removeSpaces(tok), username, streamname, messagenum);
@@ -131,7 +131,7 @@ void addExe(char *tok) {
         strcpy(temp, "./bin/");
         strcat(temp, exeName);
         if((tempfp = fopen(temp, "r")) == NULL) {
-            printf("<?php\n\texec(\"%s\");\n?>\n", exeName);    /*FIXME*/
+            printf("<?php\n\texec(\"../../../bin/%s\");\n?>\n", exeName);
         } else {
             fclose(tempfp);
             printf("<?php\n\texec(\"%s\");\n?>\n", exeName);

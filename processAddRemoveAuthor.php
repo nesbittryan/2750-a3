@@ -16,6 +16,6 @@ foreach($return as $line) {
     echo "$line";
 }
 foreach($status as $line) {
-    echo "$line";
+    echo "<br>$line";
 }
 ?>

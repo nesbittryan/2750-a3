@@ -12,7 +12,6 @@ def createStreamList():
 
 def createPermissionList(username, streamList):
     userPermissionStreamList = []
-
     flag = 0
     for word in streamList:
 
@@ -24,9 +23,7 @@ def createPermissionList(username, streamList):
                 userPermissionStreamList.append(word)
     if flag == 0:
         print ("User has no permissions...")
-        print ("here1")
         return userPermissionStreamList
-    print ("here2")
     return userPermissionStreamList
 
 def getReadMessages(username, outFileUserName):
@@ -152,27 +149,16 @@ def markAllRead(username, streamname):
     fpcopy.close
     os.rename("copy", outFileUserName)
 
-def updateReadMessages(streamname, username, currentLineNumber, unreadList, readList):
-    outFileDataName = "messages/" + streamname + "StreamData"
-    outFileUserName = "messages/" + streamname + "UserStream"
-    outFileStreamName = "messages/" + streamname + "Stream"
-    j = 0
-    read = 0
-    postStream = "DEFAULT"
-    allList = readList + unreadList
-    for item in allList:
-        if "Stream:" in item:
-            postStream = item[8:].strip()
-        if "Date: " in item:
-            if postStream == streamname:
-                read = read + 1
-        j = j + 1
-        x = currentLineNumber + 23
-        if j >= x:
-            break
+def updateReadMessages(streamname, username, readNum, limit):
+    if readNum == -1:
+        return
+    outFileUserName = "messages/" + streamname.strip() + "UserStream"
+    read = int(readNum) + 1
     infileRead = int(getReadMessages(username, outFileUserName))
     if read < int(infileRead):
         read = int(infileRead)
+    if read > limit:
+        return()
     #writing to output file
     fpUser = open(outFileUserName, "r+")
     fpcopy = open("copy", "w")
@@ -185,23 +171,27 @@ def updateReadMessages(streamname, username, currentLineNumber, unreadList, read
     fpcopy.close()
     os.rename("copy", outFileUserName)
 
-def getLastItem(myList):
-    count = 0
-    for item in myList:
-        count = count + 1
-    return count
+def printButtons(username, inputFlag, readNum, limit):
 
-def printButtons(username, inputFlag, readNum):
     print("<form action=\"processChangeMsg.php\" method=\"post\">")
     print("\n\t<input type=\"hidden\" name=\"username\" value=\""+ username.strip() +"\">\n")
     print("\n\t<input type=\"hidden\" name=\"streamChoice\" value=\""+ inputFlag + "\">\n")
-    print("\n\t<input type=\"hidden\" name=\"messageNum\" value=\""+ str(readNum-1) +"\">\n")
+    if readNum > 0:
+        print("\n\t<input type=\"hidden\" name=\"messageNum\" value=\""+ str(readNum-1) +"\">\n")
+    else:
+        print("\n\t<input type=\"hidden\" name=\"messageNum\" value=\""+ str(readNum) +"\">\n")
     print("\t<input type=\"submit\" value=\"Prev Post\">\n</form>\n")
 
     print("<form action=\"processChangeMsg.php\" method=\"post\">")
     print("\n\t<input type=\"hidden\" name=\"username\" value=\""+ username.strip() +"\">\n")
     print("\n\t<input type=\"hidden\" name=\"streamChoice\" value=\""+ inputFlag + "\">\n")
-    print("\n\t<input type=\"hidden\" name=\"messageNum\" value=\""+ str(readNum+1) +"\">\n")
+    if int(readNum) < (int(limit) - 1):
+        if int(readNum) == -1:
+            print("\n\t<input type=\"hidden\" name=\"messageNum\" value=\""+ str(readNum+2) +"\">\n")
+        else:
+            print("\n\t<input type=\"hidden\" name=\"messageNum\" value=\""+ str(readNum+1) +"\">\n")
+    else:
+        print("\n\t<input type=\"hidden\" name=\"messageNum\" value=\""+ str(readNum) +"\">\n")
     print("\t<input type=\"submit\" value=\"Next Post\">\n</form>\n")
 
     print("<form action=\"processChangeMsg.php\" method=\"post\">")
@@ -222,9 +212,24 @@ def printButtons(username, inputFlag, readNum):
     print("\n\t<input type=\"hidden\" name=\"messageNum\" value=\"-1\">\n")
     print("\t<input type=\"submit\" value=\"Check for New\">\n</form>\n")
 
+def getLimit(inputFlag, userStreamList):
+    limit = 0
+    if inputFlag == "all":
+        for item in userStreamList:
+            outFileDataName = "messages/" + item + "StreamData"
+            fp = open(outFileDataName, "r")
+            for line in fp:
+                limit = limit + 1
+
+    else:
+        outFileDataName = "messages/" + inputFlag + "StreamData"
+        fp = open(outFileDataName, "r")
+        for line in fp:
+            limit = limit + 1
+    return limit
+
 def main():
     #checking for valid username, and placing it into variable
-
     streamname = ""
     username = ""
     readNum = 0
@@ -257,6 +262,7 @@ def main():
             print (">")
         print ("\t<input type=\"submit\" value=\"submit\">\n</form>\n")
         return()
+
     streamname = sys.argv[2]
     readNum = int(sys.argv[3])
     i = 0
@@ -264,19 +270,21 @@ def main():
         if i > 3:
             username = username +" "+ word
         i = i + 1
+
+    username = username.strip()
+
     # creating list of all streams
     streamList = createStreamList()
     # checking each user file for a list of streams they are associated with
     userPermissionStreamList = createPermissionList(username, streamList)
-
     # check which stream they would like to view
     inputFlag = streamname.strip()
-
     unreadList = []
     readList = []
     mode = "chrono"
-    printButtons(username, inputFlag, readNum)
-    print("<br><br><p>")
+    limit = 0
+    limit = getLimit(inputFlag, userPermissionStreamList) + limit;
+
     if inputFlag != "all":
         readList, unReadList = getToPrint(readList, unreadList, inputFlag, username)
         if readNum == -1:
@@ -286,7 +294,10 @@ def main():
                     readNum = readNum + 1
         allList = readList + unreadList;
         msg = -1
-
+        updateReadMessages(inputFlag, username, readNum, limit)
+        printButtons(username, inputFlag, readNum, limit)
+        print("<br>")
+        print("<p>")
         for item in allList:
             if "Stream:" in item:
                 msg = msg + 1
@@ -294,6 +305,7 @@ def main():
                 print(item + "<br>")
                 if "Date:" in item:
                     print("---------------------------------------<br>")
+        print("</p>")
     else:
         for item in userPermissionStreamList:
             readList, unReadList = getToPrint(readList, unreadList, item, username)
@@ -304,6 +316,9 @@ def main():
                     readNum = readNum + 1
         allList = readList + unreadList;
         msg = -1
+        printButtons(username, inputFlag, readNum, limit)
+        print("<br>")
+        print("<p>")
         for item in allList:
             if "Stream:" in item:
                 msg = msg + 1
@@ -311,92 +326,8 @@ def main():
                 print(item + "<br>")
                 if "Date:" in item:
                     print("---------------------------------------<br>")
-    print("</p>")
+        print("</p>")
     return()
-#############################################################################################
-    if inputFlag == "all" and updateListFlag == 1:
-        unreadList = []
-        readList = []
-        for stream in userPermissionStreamList:
-            readList, unReadList = getToPrint(readList, unreadList, stream, username)
-        currentLineNumber = getLastItem(readList)
-        if mode == "author":
-            readList = sortByAuthor(readList, unreadList)
-            currentLineNumber = 0
-        else:
-            readList = sortByDate(readList)
-            unreadList = sortByDate(unreadList)
-        if not unreadList:
-            currentLineNumber = 0
-        updateListFlag = 0
-        needToPrint = 1
-    elif updateListFlag == 1:
-        unreadList = []
-        readList = []
-        readList, unReadList = getToPrint(readList, unreadList, inputFlag, username)
-        currentLineNumber = getLastItem(readList)
-        if mode == "author":
-            readList = sortByAuthor(readList, unreadList)
-            currentLineNumber = 0
-        else:
-            readList = sortByDate(readList)
-            unreadList = sortByDate(unreadList)
-        if not unreadList:
-            currentLineNumber = 0
-        updateListFlag = 0
-        needToPrint = 1
-
-    #add update read messages
-    if inputFlag == "all" and mode == "chrono":
-        for stream in userPermissionStreamList:
-            updateReadMessages(stream, username, currentLineNumber, unreadList, readList)
-    elif mode == "chrono":
-        updateReadMessages(inputFlag, username, currentLineNumber, unreadList, readList)
-
-    # determines if it needs to print if a certain action is taken
-    if needToPrint == 1:
-        printToWindow(window, readList, unreadList, currentLineNumber)
-        window.addstr(23, 0, "Page Up   Page Down   O-order toggle   M-mark all   S-stream   C-check for new")
-    needToPrint = 0
-
-    c = window.getch()
-    if c == 65:
-        currentLineNumber = currentLineNumber - 23;
-        if currentLineNumber < 0:
-            currentLineNumber = 0
-        needToPrint = 1
-    elif c == 66:
-        currentLineNumber = currentLineNumber + 23;
-        maxline = getLastLine(readList, unreadList)
-        if currentLineNumber >= int(maxline):
-            currentLineNumber = currentLineNumber - 23
-        needToPrint = 1
-    elif c == ord('o') or c == ord('O'):
-        if mode == "author":
-            mode = "chrono"
-        else:
-            mode = "author"
-        updateListFlag = 1
-    elif c == ord('m') or c == ord('M'):
-        if inputFlag == "all":
-            for stream in userPermissionStreamList:
-                markAllRead(username, stream)
-        else:
-            markAllRead(username, inputFlag)
-        updateListFlag = 1
-    elif c == ord('s') or c == ord('S'):
-        updateListFlag = 1
-        curses.echo()
-        curses.endwin()
-        for word in userPermissionStreamList:
-            print (word.strip(), end=' ')
-        print ("all")
-        inputFlag = getStreamChoice(userPermissionStreamList)
-        window = curses.initscr()
-        curses.noecho()
-        window = curses.newwin(24, 80, 0, 0)
-    elif c == ord('c') or c == ord('C'):
-        updateListFlag = 1
 
 if __name__ == "__main__":
     main()

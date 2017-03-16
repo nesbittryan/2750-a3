@@ -10,6 +10,10 @@ form {
 h1,h2,h3,h4,h5,h6 {
     color: #76323F;
 }
+p {
+    margin: 20px;
+    color: #76323F;
+}
 </style>
 .h(text="CIS2750 Messaging System").d()
 .b(name="Home",link="home.php",hInput=1)

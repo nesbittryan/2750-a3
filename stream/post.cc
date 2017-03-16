@@ -72,7 +72,7 @@ class PostEntry {
         sprintf(copy, "%d,", tm.tm_year + 1900);
         strcat(date, copy);
         if(tm.tm_hour < 12) {
-            sprintf(copy, "%d:%d", tm.tm_hour, tm.tm_min);
+            sprintf(copy, " %d:02%d", tm.tm_hour, tm.tm_min);
             strcat(date, copy);
             strcat(date, " AM");
         } else {
