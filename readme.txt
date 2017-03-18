@@ -10,11 +10,6 @@ Assumptions/Limitations I made about the assignment:
 
     That the TA marking this has mercy for my soul
 
-
-
-
-
-
 HOW TO USE EACH EXECUTABLE BY COMMAND LINE (ignore if only using web interface):
     Site converter C file (without the quotes):
 

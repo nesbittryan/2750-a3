@@ -1,7 +1,10 @@
 <?php
 $username = $_POST['username'];
 $streamChoice = $_POST['streamChoice'];
-
+if($username == "") {
+    header("Location:index.php");
+    exit;
+}
 echo "Currently logged in as: $username";
 if((isset($streamChoice)) and ($streamChoice != "NULL_STREAM")) {
     echo ", in Stream: $streamChoice";
