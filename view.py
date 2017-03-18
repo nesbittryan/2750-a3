@@ -14,7 +14,6 @@ def createPermissionList(username, streamList):
     userPermissionStreamList = []
     flag = 0
     for word in streamList:
-
         userFileName = "messages/" + word + "UserStream"
         userListFile = open(userFileName, "r")
         for line in userListFile:

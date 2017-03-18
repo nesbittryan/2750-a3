@@ -6,18 +6,17 @@ echo "Currently logged in as: $username";
 if((isset($streamChoice)) and ($streamChoice != "NULL_STREAM")) {
     echo ", in Stream: $streamChoice";
 }
-echo "<br>";
-exec("./sc header.wpml STREAM_NULL MSG_NULL $username", $header);
+exec("./sc header.wpml STREAM_NULL MSG_NULL $username 2>&1", $header);
 foreach($header as $line) {
     echo "$line";
 }
 if((isset($streamChoice)) and ($streamChoice != "NULL_STREAM")) {
-    exec("./sc home.wpml $streamChoice MSG_NULL $username", $return);
+    exec("./sc home.wpml $streamChoice MSG_NULL $username 2>&1", $return);
     foreach($return as $line) {
         echo "$line";
     }
     echo "<br>";
-    exec("./view.py STREAM_NAME $streamChoice -1 0 $username", $displayMsg);
+    exec("./view.py STREAM_NAME $streamChoice -1 0 $username 2>&1", $displayMsg);
     foreach($displayMsg as $line) {
         echo "$line";
     }

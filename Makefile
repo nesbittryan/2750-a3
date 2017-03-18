@@ -1,26 +1,26 @@
 CC=gcc
 CFLAGS = -ansi -Wall -g
 
-all: post addauthor creator
+all: libstream post addauthor creator
 
-post: stream/post.cc libstream.a
-	$(CC) $(CFLAGS) converter/converter.c -o converter/c
-	./converter/c stream/post.cc
-	rm converter/c
-	$(CC) $(CFLAGS) stream/post.c -o stream/post.o -c
-	$(CC) $(CFLAGS) stream/post.c -o stream/post -L. -lstream
-	rm stream/post.c
-	rm stream/*.o
+post: post.cc libstream.a
+	$(CC) $(CFLAGS) converter.c -o c
+	./c post.cc
+	rm c
+	$(CC) $(CFLAGS) post.c -o post.o -c
+	$(CC) $(CFLAGS) post.o -o post -L. -lstream
+	rm post.c
+	mkdir messages
 
-addauthor: stream/addauthor.c libstream.a
-	$(CC) $(CFLAGS) stream/addauthor.c -o stream/addauthor.o -c
-	$(CC) $(CFLAGS) stream/addauthor.c -o stream/addauthor -L. -lstream
-	rm stream/*.o
+addauthor: addauthor.c libstream.a
+	$(CC) $(CFLAGS) addauthor.c -o addauthor.o -c
+	$(CC) $(CFLAGS) addauthor.o -o addauthor -L. -lstream
+	rm *.o
 
-libstream.a: stream/stream.c stream/stream.h
-	$(CC) -c stream/stream.c -o stream/stream.o
-	ar cr libstream.a stream/stream.o
-	rm stream/*.o
+libstream: stream.c stream.h
+	$(CC) -c stream.c -o stream.o
+	ar cr libstream.a stream.o
+	rm *.o
 
 creator: siteCreator.c
 	$(CC) $(CFLAGS) siteCreator.c -o sc

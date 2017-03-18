@@ -4,11 +4,16 @@ Created By: Ryan Nesbitt
 ID: 0915819
 
 Assumptions/Limitations I made about the assignment:
-    That adding style elements to help improve website look was okay into the config files was okay
+    That adding style elements to help improve website look into the config files was okay
     That I can set up the usage for my programs in a way I see fit
     Text entered by users can not contain double quotes, as they will mess up the php
 
     That the TA marking this has mercy for my soul
+
+
+
+
+
 
 HOW TO USE EACH EXECUTABLE BY COMMAND LINE (ignore if only using web interface):
     Site converter C file (without the quotes):
@@ -18,7 +23,7 @@ HOW TO USE EACH EXECUTABLE BY COMMAND LINE (ignore if only using web interface):
         If you are not using hidden inputs, then these three values can be replaced
         by inputting STREAM_NULL MESSAGE_NULL and NAME_NULL
 
-        ie. " ./<path/>sc <filename.wpml> STREAM_NULL MESSAGE_NULL and NAME_NULL "
+        ie. " ./<path/>sc <filename.wpml> STREAM_NULL MESSAGE_NULL NAME_NULL "
 
         I did it this way to pass around the username, current stream and current message num
         while still using post.

@@ -2,10 +2,10 @@
 
 void updateStream(struct userPost *st) {
     int permission = 0;
-    FILE *streamFile = NULL,* userStreamFile = NULL, *streamDataFile = NULL, *streamList;
-    char * streamFilename = malloc(sizeof(char) * strlen(st->streamname) + 40);
-    char * userStreamFilename = malloc(sizeof(char) * strlen(st->streamname) + 40);
-    char * streamDataFilename = malloc(sizeof(char) * strlen(st->streamname) + 40);
+    FILE *streamFile = NULL, *userStreamFile = NULL, *streamDataFile = NULL;
+    char * streamFilename = malloc(sizeof(char) * strlen(st->streamname) + 20);
+    char * userStreamFilename = malloc(sizeof(char) * strlen(st->streamname) + 20);
+    char * streamDataFilename = malloc(sizeof(char) * strlen(st->streamname) + 20);
     /* creating stream file name */
     strcpy(streamFilename, "messages/");
     strcat(streamFilename,  st->streamname);
@@ -100,7 +100,6 @@ void addUser(char *username, char *list) {
     char * token = strtok(listCopy, ",");
     int flag = 0;
     /* parsing through list */
-
     while(token != NULL) {
         char * filename = malloc(sizeof(char) * strlen(list) + 20);
         strcpy(filename, "messages/");
@@ -109,7 +108,7 @@ void addUser(char *username, char *list) {
         userStreamFile = fopen(filename, "r");
         if(userStreamFile == NULL) {
             /* STREAM DOES NOT EXIST */
-            FILE* streamFile, *streamDataFile, *streamList;
+            FILE* streamFile = NULL, *streamDataFile = NULL, *streamList = NULL;
             streamList = fopen("messages/streamList", "a+");
             fprintf(streamList, "%s\n", token);
             fclose(streamList);
